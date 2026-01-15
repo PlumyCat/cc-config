@@ -1,0 +1,68 @@
+{
+  "cleanupPeriodDays": 30,
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "USE_BUILTIN_RIPGREP": "0",
+    "BASH_DEFAULT_TIMEOUT_MS": "30000",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "0"
+  },
+  "includeCoAuthoredBy": true,
+  "permissions": {
+    "allow": [
+      "Pnpm *",
+      "Npm *",
+      "Yarn *",
+      "Bun *",
+      "Git *",
+      "Ls",
+      "Cat",
+      "Grep",
+      "Find",
+      "Tree",
+      "Python *",
+      "Pip *",
+      "Pytest *",
+      "Ruff *",
+      "Mypy *",
+      "Node *",
+      "Tsc *",
+      "Eslint *",
+      "Prettier *",
+      "Docker *",
+      "Make *"
+    ],
+    "deny": [],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notifications.py"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notifications.py"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccsp@latest"
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true
+  }
+}

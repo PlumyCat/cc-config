@@ -1,0 +1,18 @@
+# Fichiers sensibles
+*.credentials.json
+.env
+.env.local
+
+# Cache et fichiers temporaires
+*.log
+*.tmp
+.cache/
+__pycache__/
+*.pyc
+
+# Backups locaux
+backups/
+
+# IDE
+.vscode/
+.idea/
