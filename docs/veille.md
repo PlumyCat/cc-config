@@ -30,6 +30,8 @@ Sources d'information et suivi des nouveautés.
 | **Matthew Berman** | [youtube.com/@matthew_berman](https://www.youtube.com/@matthew_berman) | Reviews outils AI |
 | **Prompt Engineering** | [youtube.com/@PromptEngineering](https://www.youtube.com/@PromptEngineering) | Tutoriels |
 | **All About AI** | [youtube.com/@AllAboutAI](https://www.youtube.com/@AllAboutAI) | Demos pratiques |
+| **Alex so yes** | [youtube.com/@alexsoyes](https://www.youtube.com/@alexsoyes) | Dev & IA (FR) |
+| **Melvyn X** | [youtube.com/@melvynxdev](https://www.youtube.com/@melvynxdev) | Dev & IA (FR) |
 | | | |
 
 <!-- Ajoute tes chaînes préférées ici -->
