@@ -1,6 +1,7 @@
 # Claude Code Configuration - cc-config
 
-Ce dépôt contient la configuration personnelle de Claude Code pour un usage professionnel.
+Configuration personnelle de Claude Code pour un usage professionnel.
+**Repo:** https://github.com/PlumyCat/cc-config
 
 ## Structure du projet
 
@@ -10,65 +11,98 @@ cc-config/
 ├── commands/           # Commandes slash personnalisées (.md)
 ├── agents/             # Agents spécialisés (.md)
 ├── hooks/              # Scripts de hooks (notifications, etc.)
-├── scripts/            # Scripts utilitaires (statusline, etc.)
-├── docs/               # Documentation additionnelle
+├── scripts/            # Scripts utilitaires
+│   ├── statusline.sh   # Barre de statut personnalisée
+│   ├── experimental.sh # Workflow de test des nouveautés
+│   ├── veille.sh       # Veille des nouveautés Claude Code
+│   └── note.sh         # Ajout rapide de notes
+├── docs/               # Documentation personnelle
+│   ├── tips.md         # Trucs et astuces à retenir
+│   ├── usage.md        # Guide d'utilisation personnel
+│   ├── changelog.md    # Historique des modifications
+│   ├── backlog.md      # Idées et choses à tester
+│   └── veille.md       # Suivi des nouveautés
+├── experimental/       # Tests en cours (branche exp/*)
 ├── install.sh          # Script d'installation
 └── CLAUDE.md           # Ce fichier
+```
+
+## Scripts disponibles
+
+### `./install.sh` - Installation
+```bash
+./install.sh              # Installation standard
+./install.sh --backup     # Avec sauvegarde préalable
+./install.sh --dry-run    # Simulation sans exécution
+```
+
+### `./scripts/experimental.sh` - Workflow de test
+```bash
+./scripts/experimental.sh start <nom>   # Démarrer un test
+./scripts/experimental.sh status        # Voir le statut
+./scripts/experimental.sh validate      # Valider et merger
+./scripts/experimental.sh rollback      # Annuler le test
+./scripts/experimental.sh list          # Historique
+```
+
+### `./scripts/veille.sh` - Veille
+```bash
+./scripts/veille.sh           # Résumé rapide
+./scripts/veille.sh open      # Ouvrir les sources
+./scripts/veille.sh version   # Versions actuelles
+```
+
+### `./scripts/note.sh` - Notes rapides
+```bash
+./scripts/note.sh tip "message"        # Ajouter un tip
+./scripts/note.sh todo "message"       # Ajouter au backlog
+./scripts/note.sh veille "message"     # Note de veille
+./scripts/note.sh changelog "message"  # Entrée changelog
+```
+
+## Workflows
+
+### Tester une nouveauté Claude Code
+1. `./scripts/veille.sh` pour voir les nouveautés
+2. `./scripts/experimental.sh start feature-name`
+3. Modifier la config dans ce dépôt
+4. `./install.sh` pour appliquer
+5. Tester sur un projet non-critique
+6. `./scripts/experimental.sh validate` ou `rollback`
+
+### Mise à jour de la config
+1. Modifier les fichiers dans ce dépôt
+2. `./install.sh --dry-run` pour vérifier
+3. `./install.sh --backup` pour appliquer
+4. `git add -A && git commit && git push`
+
+### Ajouter une note rapidement
+```bash
+./scripts/note.sh tip "Ne pas oublier --resume"
+./scripts/note.sh todo "Tester le nouveau hook"
 ```
 
 ## Conventions
 
 ### Settings (settings.json)
-- Les permissions utilisent le format `"Tool pattern"` (ex: `"Git *"`)
-- Les hooks sont organisés par événement (`Stop`, `Notification`)
-- `defaultMode: "acceptEdits"` pour un workflow fluide
+- Permissions: format `"Tool pattern"` (ex: `"Git *"`)
+- Hooks: organisés par événement (`Stop`, `Notification`)
+- Mode par défaut: `acceptEdits`
 
-### Commands (commandes slash)
+### Commands
 - Un fichier `.md` par commande dans `commands/`
-- Nom du fichier = nom de la commande (sans le `/`)
-- Format: description en markdown avec instructions pour Claude
+- Nom du fichier = nom de la commande (sans `/`)
 
 ### Agents
 - Un fichier `.md` par agent dans `agents/`
-- Définir clairement le rôle et les outils disponibles
-- Inclure des exemples d'utilisation
+- Définir le rôle, outils, et exemples d'utilisation
 
-### Hooks
-- Scripts exécutables dans `hooks/`
-- Supporter les modes SSH et desktop
-- Logger dans `/tmp/claude-notifications/` si en SSH
+## Documentation
 
-## Installation
-
-```bash
-# Installation standard
-./install.sh
-
-# Voir ce qui serait fait sans exécuter
-./install.sh --dry-run
-
-# Avec backup de la config existante
-./install.sh --backup
-```
-
-## Workflow de mise à jour
-
-1. Modifier les fichiers dans ce dépôt
-2. Tester avec `./install.sh --dry-run`
-3. Installer avec `./install.sh --backup`
-4. Commit et push les changements
-
-## Bonnes pratiques
-
-- Toujours faire un backup avant modification majeure
-- Versionner tous les changements avec git
-- Documenter les changements dans les commits
-- Tester les nouvelles commands/agents avant de les intégrer
-
-## Fichiers importants
-
-| Fichier | Description |
-|---------|-------------|
-| `settings/settings.json` | Config principale Claude Code |
-| `hooks/notifications.py` | Hook de notifications desktop/SSH |
-| `scripts/statusline.sh` | Script de la barre de statut |
+| Fichier | Usage |
+|---------|-------|
+| `docs/tips.md` | Trucs à ne pas oublier |
+| `docs/usage.md` | Guide personnel |
+| `docs/changelog.md` | Historique des modifs |
+| `docs/backlog.md` | Idées à tester |
+| `docs/veille.md` | Suivi des nouveautés |
