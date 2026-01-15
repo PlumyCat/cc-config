@@ -1,0 +1,68 @@
+{
+  "playwright": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@playwright/mcp@latest"],
+    "env": {}
+  },
+  "github": {
+    "type": "stdio",
+    "command": "docker",
+    "args": [
+      "run", "-i", "--rm",
+      "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "ghcr.io/github/github-mcp-server"
+    ],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+    }
+  },
+  "sequential-thinking": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    "env": {}
+  },
+  "time": {
+    "type": "stdio",
+    "command": "uvx",
+    "args": ["mcp-server-time"],
+    "env": {}
+  },
+  "memory": {
+    "type": "stdio",
+    "command": "npx",
+    "args": [
+      "-y", "@modelcontextprotocol/server-memory",
+      "--env", "MEMORY_FILE_PATH=${HOME}/.claude/memory.json"
+    ],
+    "env": {}
+  },
+  "streamable-mcp-server": {
+    "type": "http",
+    "url": "http://127.0.0.1:12306/mcp"
+  },
+  "ai-elements": {
+    "command": "npx",
+    "args": ["-y", "mcp-remote", "https://registry.ai-sdk.dev/api/mcp"]
+  },
+  "serena": {
+    "type": "stdio",
+    "command": "uv",
+    "args": ["--directory", "${HOME}/serena", "run", "serena-mcp-server"],
+    "env": {}
+  },
+  "ms-learn": {
+    "type": "http",
+    "url": "https://learn.microsoft.com/api/mcp",
+    "headers": {
+      "Authorization": "Bearer ${GITHUB_TOKEN}"
+    }
+  },
+  "shadcn": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["shadcn@latest", "mcp"],
+    "env": {}
+  }
+}

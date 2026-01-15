@@ -1,7 +1,10 @@
-# Fichiers sensibles
+# Fichiers sensibles - NE JAMAIS COMMITER
 *.credentials.json
 .env
 .env.local
+*secrets*
+*token*
+*.key
 
 # Cache et fichiers temporaires
 *.log

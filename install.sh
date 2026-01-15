@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script d'installation de la configuration Claude Code
-# Usage: ./install.sh [--dry-run] [--backup]
+# Usage: ./install.sh [--dry-run] [--backup] [--mcp]
 #
 
 set -e
@@ -18,6 +18,7 @@ NC='\033[0m'
 
 DRY_RUN=false
 DO_BACKUP=false
+DO_MCP=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -30,10 +31,15 @@ while [[ $# -gt 0 ]]; do
             DO_BACKUP=true
             shift
             ;;
+        --mcp)
+            DO_MCP=true
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $0 [--dry-run] [--backup]"
+            echo "Usage: $0 [--dry-run] [--backup] [--mcp]"
             echo "  --dry-run  Affiche les actions sans les exécuter"
             echo "  --backup   Sauvegarde la config existante avant installation"
+            echo "  --mcp      Installe aussi la config MCP (nécessite mcp-secrets.env)"
             exit 0
             ;;
         *)
@@ -118,6 +124,16 @@ if [ -d "$SCRIPT_DIR/scripts" ] && [ "$(ls -A $SCRIPT_DIR/scripts 2>/dev/null)" 
     for script in "$SCRIPT_DIR/scripts/"*; do
         [ -f "$script" ] && run "cp '$script' '$CLAUDE_DIR/' && chmod +x '$CLAUDE_DIR/$(basename $script)'"
     done
+fi
+
+# Installer MCP si demandé
+if [ "$DO_MCP" = true ]; then
+    log "Installation de la config MCP..."
+    if [ "$DRY_RUN" = true ]; then
+        run "$SCRIPT_DIR/scripts/mcp-install.sh --check"
+    else
+        run "$SCRIPT_DIR/scripts/mcp-install.sh"
+    fi
 fi
 
 log "Installation terminée!"
