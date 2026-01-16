@@ -44,7 +44,7 @@ Sources d'information et suivi des nouveautés.
 
 | Date       | Feature     | Source                                                                 | Priorité |
 | ---------- | ----------- | ---------------------------------------------------------------------- | -------- |
-| 2025-01-16 | BMAD Method | [YouTube](https://www.youtube.com/watch?v=LorEJPrALcg) / [GitHub](https://github.com/aj-geddes/claude-code-bmad-skills) | Haute    |
+|            |             |                                                                        |          |
 
 ### Testées (en experimental)
 
@@ -54,10 +54,11 @@ Sources d'information et suivi des nouveautés.
 
 ### Adoptées
 
-| Date       | Feature           | Notes             |
-| ---------- | ----------------- | ----------------- |
-| 2025-01-15 | Plugin ralph-loop | Activé par défaut |
-| 2025-01-15 | Statusline custom | Via npx ccsp      |
+| Date       | Feature           | Notes                              |
+| ---------- | ----------------- | ---------------------------------- |
+| 2025-01-16 | BMAD Method v6    | 9 agents, 15 workflows - Full test |
+| 2025-01-15 | Plugin ralph-loop | Activé par défaut                  |
+| 2025-01-15 | Statusline custom | Via npx ccsp                       |
 
 ---
 
@@ -100,8 +101,10 @@ npm view @anthropic-ai/claude-code version
 **Découvertes:**
 - **BMAD Method v6** - Framework agile AI-driven avec 9 agents spécialisés pour Claude Code
 
-**À tester:**
-- Installation via [claude-code-bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills)
+**Testé et adopté:**
+- ✅ BMAD Method installé via [claude-code-bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills)
+- ✅ Workflow complet testé sur cc-config: workflow-init → product-brief → prd → architecture → sprint-planning
+- ✅ Génère une documentation complète et structurée (PRD, Architecture, Sprint Plan)
 
 ---
 
