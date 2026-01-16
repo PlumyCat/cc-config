@@ -11,8 +11,8 @@ sprints:
     end_date: "2025-01-23"
     capacity_points: 19
     committed_points: 19
-    completed_points: 16
-    status: "in_progress"
+    completed_points: 19
+    status: "completed"
     goal: "Valider toutes les fonctionnalités et compléter les éléments manquants"
     stories:
       # EPIC-001: Gestion Configuration
@@ -72,7 +72,8 @@ sprints:
         epic: "EPIC-002"
         points: 1
         priority: "could_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
 
       # EPIC-003: Installation & Portabilité
       - story_id: "STORY-009"
@@ -117,17 +118,19 @@ sprints:
         epic: "EPIC-004"
         points: 1
         priority: "could_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-015"
         title: "Changelog"
         epic: "EPIC-004"
         points: 1
         priority: "could_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
 
 velocity:
-  sprint_1: null
-  rolling_average: null
+  sprint_1: 19
+  rolling_average: 19
 
 team:
   size: 1

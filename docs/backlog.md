@@ -14,7 +14,7 @@ Idées, choses à tester, améliorations futures.
 
 | Priorité | Item | Status | Notes |
 |----------|------|--------|-------|
-| 🔥 Haute | BMAD Method v6 | 🔴 À faire | Framework agents agile pour Claude Code |
+| 🔥 Haute | BMAD Method v6 | 🟢 Fait | Framework agents agile pour Claude Code - Adopté 2025-01-16 |
 
 ---
 
