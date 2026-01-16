@@ -17,8 +17,20 @@ RESET='\033[00m'
 BOLD='\033[1m'
 
 # Extraire les données du JSON avec jq
-MODEL=$(echo "$input" | jq -r '.model.display_name // "N/A"')
+MODEL_ID=$(echo "$input" | jq -r '.model.id // "N/A"')
+
+# Convertir l'ID du modèle en nom court
+case "$MODEL_ID" in
+    *opus*) MODEL="Opus" ;;
+    *sonnet*) MODEL="Sonnet" ;;
+    *haiku*) MODEL="Haiku" ;;
+    *) MODEL="$MODEL_ID" ;;
+esac
+
+# Extraire le pourcentage d'utilisation du contexte
 PERCENT_USED=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
+TOTAL_TOKENS=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+MAX_TOKENS=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 
 # User@hostname (from PS1: \u@\h)
 printf "${GREEN}%s@%s${RESET}:" "$(whoami)" "$(hostname -s)"

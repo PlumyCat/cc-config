@@ -56,3 +56,5 @@ Idées, choses à tester, améliorations futures.
 <!-- Idées en vrac, à trier plus tard -->
 
 
+
+- [ ] voir comment et ce que peut apporter pour le projet be-cloud.ai Ralph (2026-01-16)
