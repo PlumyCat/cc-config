@@ -11,7 +11,7 @@ sprints:
     end_date: "2025-01-23"
     capacity_points: 19
     committed_points: 19
-    completed_points: 0
+    completed_points: 6
     status: "in_progress"
     goal: "Valider toutes les fonctionnalités et compléter les éléments manquants"
     stories:
@@ -21,13 +21,15 @@ sprints:
         epic: "EPIC-001"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-002"
         title: "Organiser les commands"
         epic: "EPIC-001"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-003"
         title: "Organiser les agents"
         epic: "EPIC-001"
@@ -53,7 +55,8 @@ sprints:
         epic: "EPIC-002"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-007"
         title: "Documenter workflow experimental"
         epic: "EPIC-002"
@@ -73,7 +76,8 @@ sprints:
         epic: "EPIC-003"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-010"
         title: "Options --dry-run et --backup"
         epic: "EPIC-003"
@@ -87,13 +91,15 @@ sprints:
         epic: "EPIC-004"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-012"
         title: "Système veille complet"
         epic: "EPIC-004"
         points: 1
         priority: "must_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-013"
         title: "Script note.sh"
         epic: "EPIC-004"
