@@ -42,9 +42,9 @@ Sources d'information et suivi des nouveautés.
 
 ### En attente de test
 
-| Date | Feature | Source | Priorité |
-| ---- | ------- | ------ | -------- |
-|      |         |        |          |
+| Date       | Feature     | Source                                                                 | Priorité |
+| ---------- | ----------- | ---------------------------------------------------------------------- | -------- |
+| 2025-01-16 | BMAD Method | [YouTube](https://www.youtube.com/watch?v=LorEJPrALcg) / [GitHub](https://github.com/aj-geddes/claude-code-bmad-skills) | Haute    |
 
 ### Testées (en experimental)
 
@@ -95,12 +95,52 @@ npm view @anthropic-ai/claude-code version
 
 <!-- Journal des découvertes -->
 
-### Semaine du YYYY-MM-DD
+### Semaine du 2025-01-16
 
 **Découvertes:**
--
+- **BMAD Method v6** - Framework agile AI-driven avec 9 agents spécialisés pour Claude Code
 
 **À tester:**
--
+- Installation via [claude-code-bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills)
+
+---
+
+## BMAD Method - Notes détaillées
+
+### Qu'est-ce que BMAD ?
+**BMAD** = Breakthrough Method for Agile AI-Driven Development
+
+Framework open-source avec agents spécialisés qui guident le développement logiciel via des workflows structurés. Concept clé : "document sharding" - découper la documentation en morceaux digestibles pour l'IA.
+
+### 9 Agents disponibles
+
+| Agent | Rôle |
+|-------|------|
+| BMad Master | Orchestration & coordination |
+| Business Analyst | Discovery produit & analyse marché |
+| Product Manager | Documentation requirements (PRD) |
+| System Architect | Design technique & validation |
+| Scrum Master | Planning sprint & création stories |
+| Developer | Implémentation avec tests |
+| UX Designer | Flows utilisateur & accessibilité |
+| Builder | Création agents/workflows custom |
+| Creative Intelligence | Brainstorming & recherche |
+
+### 15 Commandes workflow
+
+**Phase 1 - Analyse:** `/product-brief`, `/workflow-init`, `/workflow-status`
+**Phase 2 - Planning:** `/prd`, `/tech-spec`
+**Phase 3 - Design:** `/architecture`, `/solutioning-gate-check`
+**Phase 4 - Dev:** `/sprint-planning`, `/create-story`, `/dev-story`
+**Extensibilité:** `/create-agent`, `/create-workflow`, `/brainstorm`, `/research`, `/create-ux-design`
+
+### Ressources
+
+| Ressource | URL |
+|-----------|-----|
+| Repo officiel | https://github.com/bmad-code-org/BMAD-METHOD |
+| Claude Code Skills | https://github.com/aj-geddes/claude-code-bmad-skills |
+| Vidéo créateur | https://www.youtube.com/watch?v=LorEJPrALcg |
+| Discord | discord.gg/gk8jAdXWmj |
 
 ---

@@ -1,0 +1,123 @@
+version: "6.0.0"
+project_name: "cc-config"
+project_level: 2
+current_sprint: 1
+sprint_plan_path: "docs/sprint-plan-cc-config-2025-01-16.md"
+
+sprints:
+  - sprint_number: 1
+    name: "Validation & Complétion"
+    start_date: "2025-01-16"
+    end_date: "2025-01-23"
+    capacity_points: 19
+    committed_points: 19
+    completed_points: 0
+    status: "in_progress"
+    goal: "Valider toutes les fonctionnalités et compléter les éléments manquants"
+    stories:
+      # EPIC-001: Gestion Configuration
+      - story_id: "STORY-001"
+        title: "Centraliser settings.json"
+        epic: "EPIC-001"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-002"
+        title: "Organiser les commands"
+        epic: "EPIC-001"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-003"
+        title: "Organiser les agents"
+        epic: "EPIC-001"
+        points: 1
+        priority: "should_have"
+        status: "to_validate"
+      - story_id: "STORY-004"
+        title: "Configurer les hooks"
+        epic: "EPIC-001"
+        points: 2
+        priority: "should_have"
+        status: "partial"
+      - story_id: "STORY-005"
+        title: "Documenter les MCP"
+        epic: "EPIC-001"
+        points: 2
+        priority: "should_have"
+        status: "not_started"
+
+      # EPIC-002: Workflow Experimental
+      - story_id: "STORY-006"
+        title: "Script experimental.sh"
+        epic: "EPIC-002"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-007"
+        title: "Documenter workflow experimental"
+        epic: "EPIC-002"
+        points: 2
+        priority: "should_have"
+        status: "partial"
+      - story_id: "STORY-008"
+        title: "Template current.md"
+        epic: "EPIC-002"
+        points: 1
+        priority: "could_have"
+        status: "to_validate"
+
+      # EPIC-003: Installation & Portabilité
+      - story_id: "STORY-009"
+        title: "Script install.sh"
+        epic: "EPIC-003"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-010"
+        title: "Options --dry-run et --backup"
+        epic: "EPIC-003"
+        points: 2
+        priority: "should_have"
+        status: "partial"
+
+      # EPIC-004: Documentation & Veille
+      - story_id: "STORY-011"
+        title: "Fichier tips.md"
+        epic: "EPIC-004"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-012"
+        title: "Système veille complet"
+        epic: "EPIC-004"
+        points: 1
+        priority: "must_have"
+        status: "to_validate"
+      - story_id: "STORY-013"
+        title: "Script note.sh"
+        epic: "EPIC-004"
+        points: 1
+        priority: "should_have"
+        status: "to_validate"
+      - story_id: "STORY-014"
+        title: "Backlog structuré"
+        epic: "EPIC-004"
+        points: 1
+        priority: "could_have"
+        status: "to_validate"
+      - story_id: "STORY-015"
+        title: "Changelog"
+        epic: "EPIC-004"
+        points: 1
+        priority: "could_have"
+        status: "to_validate"
+
+velocity:
+  sprint_1: null
+  rolling_average: null
+
+team:
+  size: 1
+  sprint_length_weeks: 1
+  capacity_per_sprint: 19
