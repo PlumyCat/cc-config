@@ -11,7 +11,7 @@ sprints:
     end_date: "2025-01-23"
     capacity_points: 19
     committed_points: 19
-    completed_points: 6
+    completed_points: 16
     status: "in_progress"
     goal: "Valider toutes les fonctionnalités et compléter les éléments manquants"
     stories:
@@ -35,19 +35,22 @@ sprints:
         epic: "EPIC-001"
         points: 1
         priority: "should_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-004"
         title: "Configurer les hooks"
         epic: "EPIC-001"
         points: 2
         priority: "should_have"
-        status: "partial"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-005"
         title: "Documenter les MCP"
         epic: "EPIC-001"
         points: 2
         priority: "should_have"
-        status: "not_started"
+        status: "completed"
+        completed_date: "2025-01-16"
 
       # EPIC-002: Workflow Experimental
       - story_id: "STORY-006"
@@ -62,7 +65,8 @@ sprints:
         epic: "EPIC-002"
         points: 2
         priority: "should_have"
-        status: "partial"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-008"
         title: "Template current.md"
         epic: "EPIC-002"
@@ -83,7 +87,8 @@ sprints:
         epic: "EPIC-003"
         points: 2
         priority: "should_have"
-        status: "partial"
+        status: "completed"
+        completed_date: "2025-01-16"
 
       # EPIC-004: Documentation & Veille
       - story_id: "STORY-011"
@@ -105,7 +110,8 @@ sprints:
         epic: "EPIC-004"
         points: 1
         priority: "should_have"
-        status: "to_validate"
+        status: "completed"
+        completed_date: "2025-01-16"
       - story_id: "STORY-014"
         title: "Backlog structuré"
         epic: "EPIC-004"
