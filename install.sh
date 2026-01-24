@@ -70,6 +70,23 @@ run() {
     fi
 }
 
+# Validate directory is safe (exists, is a directory, not a symlink)
+validate_dir() {
+    local dir="$1"
+    local name="$2"
+    if [ ! -e "$dir" ]; then
+        warn "Directory does not exist: $dir"
+        return 1
+    fi
+    if [ -L "$dir" ]; then
+        error "Security: $name is a symlink, refusing to process: $dir"
+    fi
+    if [ ! -d "$dir" ]; then
+        error "Security: $name is not a directory: $dir"
+    fi
+    return 0
+}
+
 # Vérifier que le dossier Claude existe
 if [ ! -d "$CLAUDE_DIR" ]; then
     error "Le dossier $CLAUDE_DIR n'existe pas. Claude Code est-il installé?"
@@ -103,7 +120,18 @@ fi
 if [ -d "$SCRIPT_DIR/skills" ] && [ "$(ls -A $SCRIPT_DIR/skills 2>/dev/null)" ]; then
     log "Installation des skills..."
     for skill_dir in "$SCRIPT_DIR/skills/"*/; do
+        # Skip if glob didn't match anything
+        [ -d "$skill_dir" ] || continue
+        # Validate directory is safe
+        if ! validate_dir "$skill_dir" "skill"; then
+            continue
+        fi
         skill_name=$(basename "$skill_dir")
+        # Validate skill name (alphanumeric, dash, underscore only)
+        if [[ ! "$skill_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            warn "Skipping invalid skill name: $skill_name"
+            continue
+        fi
         run "mkdir -p '$CLAUDE_DIR/skills/$skill_name'"
         run "cp -r '$skill_dir'* '$CLAUDE_DIR/skills/$skill_name/'"
     done
@@ -112,14 +140,29 @@ fi
 # Copier les agents
 if [ -d "$SCRIPT_DIR/agents" ] && [ "$(ls -A $SCRIPT_DIR/agents 2>/dev/null)" ]; then
     log "Installation des agents..."
-    run "cp '$SCRIPT_DIR/agents/'*.md '$CLAUDE_DIR/agents/'"
+    # Copy only .md files, skip symlinks
+    for agent_file in "$SCRIPT_DIR/agents/"*.md; do
+        [ -f "$agent_file" ] || continue
+        if [ -L "$agent_file" ]; then
+            warn "Skipping symlink: $agent_file"
+            continue
+        fi
+        run "cp '$agent_file' '$CLAUDE_DIR/agents/'"
+    done
 fi
 
 # Copier les hooks
 if [ -d "$SCRIPT_DIR/hooks" ] && [ "$(ls -A $SCRIPT_DIR/hooks 2>/dev/null)" ]; then
     log "Installation des hooks..."
-    run "cp '$SCRIPT_DIR/hooks/'* '$CLAUDE_DIR/hooks/'"
-    run "chmod +x '$CLAUDE_DIR/hooks/'*"
+    for hook_file in "$SCRIPT_DIR/hooks/"*; do
+        [ -f "$hook_file" ] || continue
+        if [ -L "$hook_file" ]; then
+            warn "Skipping symlink: $hook_file"
+            continue
+        fi
+        run "cp '$hook_file' '$CLAUDE_DIR/hooks/'"
+    done
+    run "chmod +x '$CLAUDE_DIR/hooks/'* 2>/dev/null || true"
 fi
 
 # Copier les scripts

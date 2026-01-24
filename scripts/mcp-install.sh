@@ -36,6 +36,29 @@ check_secrets() {
     return 0
 }
 
+# Valider le format d'un token GitHub
+validate_github_token() {
+    local token="$1"
+    # Formats valides: ghp_*, github_pat_*, gho_*, ghu_*, ghs_*, ghr_*
+    if [[ -z "$token" ]]; then
+        return 1
+    fi
+    if [[ "$token" =~ ^(ghp_|github_pat_|gho_|ghu_|ghs_|ghr_)[a-zA-Z0-9_]+$ ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# Valider que la chaîne ne contient pas de caractères dangereux pour JSON
+validate_safe_string() {
+    local str="$1"
+    # Rejeter les caractères qui pourraient casser le JSON ou permettre l'injection
+    if [[ "$str" =~ [\"\'\`\$\{\}\[\]\;] ]]; then
+        return 1
+    fi
+    return 0
+}
+
 # Charger les secrets
 load_secrets() {
     if [ -f "$SECRETS_FILE" ]; then
@@ -46,14 +69,32 @@ load_secrets() {
     fi
 }
 
-# Substituer les variables dans le template
+# Substituer les variables dans le template de manière sécurisée avec jq
 substitute_vars() {
-    local content=$(cat "$TEMPLATE_FILE")
+    # Valider les tokens avant substitution
+    if [ -n "$GITHUB_TOKEN" ]; then
+        if ! validate_github_token "$GITHUB_TOKEN"; then
+            error "GITHUB_TOKEN a un format invalide (attendu: ghp_*, github_pat_*, etc.)"
+        fi
+    fi
 
-    # Substituer ${VAR} par la valeur de $VAR
-    content=$(echo "$content" | envsubst)
+    # Utiliser jq pour substituer les variables de manière sécurisée
+    # --arg échappe automatiquement les caractères spéciaux JSON
+    jq --arg github_token "${GITHUB_TOKEN:-}" \
+       --arg home "$HOME" \
+       '
+       # Substituer GITHUB_TOKEN dans github.env
+       .github.env.GITHUB_PERSONAL_ACCESS_TOKEN = $github_token |
 
-    echo "$content"
+       # Substituer GITHUB_TOKEN dans ms-learn.headers
+       ."ms-learn".headers.Authorization = "Bearer \($github_token)" |
+
+       # Substituer HOME dans memory.args
+       .memory.args = ["-y", "@modelcontextprotocol/server-memory", "--env", "MEMORY_FILE_PATH=\($home)/.claude/memory.json"] |
+
+       # Substituer HOME dans serena.args
+       .serena.args = ["--directory", "\($home)/serena", "run", "serena-mcp-server"]
+       ' "$TEMPLATE_FILE"
 }
 
 # Mettre à jour ~/.claude.json avec la nouvelle config MCP

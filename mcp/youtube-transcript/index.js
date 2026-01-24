@@ -10,13 +10,83 @@ import { pipeline } from "@huggingface/transformers";
 import pkg from "wavefile";
 const { WaveFile } = pkg;
 import YTDlpWrap from "yt-dlp-wrap";
-import { exec } from "child_process";
+import { exec, execFile } from "child_process";
 import { promisify } from "util";
 import fs from "fs/promises";
 import path from "path";
 import os from "os";
 
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
+
+// Simple rate limiter (token bucket algorithm)
+class RateLimiter {
+  constructor(maxRequests = 5, windowMs = 60000) {
+    this.maxRequests = maxRequests;
+    this.windowMs = windowMs;
+    this.requests = [];
+  }
+
+  canMakeRequest() {
+    const now = Date.now();
+    // Remove expired requests
+    this.requests = this.requests.filter(t => now - t < this.windowMs);
+    return this.requests.length < this.maxRequests;
+  }
+
+  recordRequest() {
+    this.requests.push(Date.now());
+  }
+
+  getWaitTime() {
+    if (this.canMakeRequest()) return 0;
+    const oldest = this.requests[0];
+    return Math.max(0, this.windowMs - (Date.now() - oldest));
+  }
+}
+
+// Rate limiter: 5 requests per minute
+const rateLimiter = new RateLimiter(5, 60000);
+
+// Transcript cache (videoId -> { transcript, timestamp })
+const transcriptCache = new Map();
+const CACHE_TTL_MS = 3600000; // 1 hour
+
+function getCachedTranscript(videoId) {
+  const cached = transcriptCache.get(videoId);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    console.error(`Cache hit for ${videoId}`);
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedTranscript(videoId, data) {
+  transcriptCache.set(videoId, { data, timestamp: Date.now() });
+  // Limit cache size to 100 entries
+  if (transcriptCache.size > 100) {
+    const oldest = transcriptCache.keys().next().value;
+    transcriptCache.delete(oldest);
+  }
+}
+
+// ISO 639-1 language codes whitelist
+const VALID_LANG_CODES = new Set([
+  'en', 'fr', 'es', 'de', 'it', 'pt', 'nl', 'ru', 'zh', 'ja', 'ko', 'ar',
+  'hi', 'pl', 'tr', 'vi', 'th', 'id', 'cs', 'sv', 'da', 'fi', 'no', 'hu',
+  'el', 'he', 'ro', 'uk', 'bg', 'hr', 'sk', 'sl', 'lt', 'lv', 'et', 'ms'
+]);
+
+// Validate language code
+function validateLang(lang) {
+  if (!lang) return null;
+  const normalized = lang.toLowerCase().trim();
+  if (VALID_LANG_CODES.has(normalized)) {
+    return normalized;
+  }
+  console.error(`Invalid language code: ${lang}, using auto-detect`);
+  return null;
+}
 
 // Whisper pipeline (lazy loaded)
 let whisperPipeline = null;
@@ -48,7 +118,8 @@ function formatTimestamp(ms) {
 
 // Try to get transcript from YouTube
 async function getYouTubeTranscript(videoId, lang) {
-  const options = lang ? { lang } : {};
+  const validLang = validateLang(lang);
+  const options = validLang ? { lang: validLang } : {};
   const transcript = await YoutubeTranscript.fetchTranscript(videoId, options);
 
   return transcript.map((segment) => ({
@@ -74,20 +145,27 @@ async function getWhisperPipeline() {
 
 // Download audio from YouTube using yt-dlp
 async function downloadAudio(videoId) {
-  const tmpDir = os.tmpdir();
-  const outputPath = path.join(tmpDir, `${videoId}.wav`);
   const homeDir = os.homedir();
+
+  // Create secure temporary directory with unique name
+  const secureDir = await fs.mkdtemp(path.join(os.tmpdir(), 'yt-trans-'));
+  const outputPath = path.join(secureDir, `${videoId}.wav`);
+  const tempFile = path.join(secureDir, `${videoId}_temp`);
+
+  // Set restrictive permissions on temp directory
+  await fs.chmod(secureDir, 0o700);
 
   // Try multiple yt-dlp paths (pip install location first, then system)
   const ytdlpPaths = [
     path.join(homeDir, ".local/bin/yt-dlp"),
-    "yt-dlp",
+    "/usr/local/bin/yt-dlp",
+    "/usr/bin/yt-dlp",
   ];
 
   let ytdlp = null;
   for (const p of ytdlpPaths) {
     try {
-      await execAsync(`${p} --version`);
+      await execFileAsync(p, ["--version"]);
       ytdlp = p;
       break;
     } catch {
@@ -96,32 +174,47 @@ async function downloadAudio(videoId) {
   }
 
   if (!ytdlp) {
+    // Cleanup on error
+    await fs.rm(secureDir, { recursive: true, force: true }).catch(() => {});
     throw new Error("yt-dlp not installed. Install with: pip install yt-dlp");
   }
 
-  // Download and convert to WAV 16kHz mono
-  const url = `https://www.youtube.com/watch?v=${videoId}`;
-  const tempFile = path.join(tmpDir, `${videoId}_temp`);
-  const cookiesFile = path.join(path.dirname(new URL(import.meta.url).pathname), "cookies.txt");
+  // Build URL safely
+  const url = new URL("https://www.youtube.com/watch");
+  url.searchParams.set("v", videoId);
 
-  // Use cookies file for auth (exported from Chrome)
-  const ytdlpOpts = [
-    `-x --audio-format wav`,
-    `-o "${tempFile}.%(ext)s"`,
-    `--cookies "${cookiesFile}"`,
-  ].join(" ");
+  const cookiesFile = path.join(path.dirname(new URL(import.meta.url).pathname), "cookies.txt");
 
   // Add deno to PATH for JS challenge solving
   const env = { ...process.env, PATH: `${homeDir}/.deno/bin:${process.env.PATH}` };
 
-  await execAsync(
-    `${ytdlp} ${ytdlpOpts} "${url}" && ` +
-    `ffmpeg -y -i "${tempFile}.wav" -ar 16000 -ac 1 "${outputPath}" 2>/dev/null && ` +
-    `rm -f "${tempFile}.wav"`,
-    { timeout: 300000, env }
-  );
+  try {
+    // Use execFile for yt-dlp (safer than shell execution)
+    const ytdlpArgs = [
+      "-x", "--audio-format", "wav",
+      "-o", `${tempFile}.%(ext)s`,
+      "--cookies", cookiesFile,
+      url.toString()
+    ];
 
-  return outputPath;
+    await execFileAsync(ytdlp, ytdlpArgs, { timeout: 300000, env });
+
+    // Use execFile for ffmpeg conversion
+    await execFileAsync("ffmpeg", [
+      "-y", "-i", `${tempFile}.wav`,
+      "-ar", "16000", "-ac", "1",
+      outputPath
+    ], { timeout: 60000, env });
+
+    // Cleanup temp file
+    await fs.unlink(`${tempFile}.wav`).catch(() => {});
+
+    return outputPath;
+  } catch (error) {
+    // Guaranteed cleanup on error
+    await fs.rm(secureDir, { recursive: true, force: true }).catch(() => {});
+    throw error;
+  }
 }
 
 // Transcribe audio with Whisper
@@ -146,8 +239,13 @@ async function transcribeWithWhisper(audioPath) {
     return_timestamps: true,
   });
 
-  // Clean up temp file
+  // Clean up temp file and its parent directory
+  const parentDir = path.dirname(audioPath);
   await fs.unlink(audioPath).catch(() => {});
+  // Remove the secure temp directory if it matches our pattern
+  if (parentDir.includes('yt-trans-')) {
+    await fs.rm(parentDir, { recursive: true, force: true }).catch(() => {});
+  }
 
   // Format output
   if (result.chunks) {
@@ -202,6 +300,27 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     const videoId = extractVideoId(url);
+
+    // Check cache first (unless force_whisper)
+    if (!force_whisper) {
+      const cached = getCachedTranscript(videoId);
+      if (cached) {
+        return {
+          content: [{ type: "text", text: cached + "\n\n(from cache)" }],
+        };
+      }
+    }
+
+    // Check rate limiter
+    if (!rateLimiter.canMakeRequest()) {
+      const waitTime = Math.ceil(rateLimiter.getWaitTime() / 1000);
+      return {
+        content: [{ type: "text", text: `Rate limit exceeded. Please wait ${waitTime} seconds before trying again.` }],
+        isError: true,
+      };
+    }
+    rateLimiter.recordRequest();
+
     let segments = [];
     let source = "youtube_captions";
 
@@ -238,6 +357,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       `Segments: ${segments.length}\n` +
       `Duration: ~${Math.round(totalDuration / 1000)}s\n\n` +
       formattedText;
+
+    // Cache the result
+    setCachedTranscript(videoId, summary);
 
     return {
       content: [{ type: "text", text: summary }],

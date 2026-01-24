@@ -1,10 +1,19 @@
 # Fichiers sensibles - NE JAMAIS COMMITER
 *.credentials.json
 .env
+.env.*
+!.env.example
 .env.local
 *secrets*
 *token*
 *.key
+*.pem
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.mcp.json.local
+mcp-secrets.env
 
 # Cache et fichiers temporaires
 *.log

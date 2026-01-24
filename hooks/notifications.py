@@ -74,12 +74,23 @@ def send_notification(title: str, message: str) -> None:
                 ps_script
             ], check=False, timeout=10)
             
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+    except subprocess.TimeoutExpired as e:
+        # Log timeout error to stderr for debugging
+        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
+            print(f"[notifications.py] Timeout: {e}", file=sys.stderr)
         # Fallback : bell system
-        try:
-            print("\a", end="", flush=True)  # Bell character
-        except:
-            pass
+        print("\a", end="", flush=True)
+    except FileNotFoundError as e:
+        # Log missing command to stderr for debugging
+        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
+            print(f"[notifications.py] Command not found: {e.filename}", file=sys.stderr)
+        # Fallback : bell system
+        print("\a", end="", flush=True)
+    except Exception as e:
+        # Log unexpected errors
+        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
+            print(f"[notifications.py] Error: {type(e).__name__}: {e}", file=sys.stderr)
+        print("\a", end="", flush=True)
 
 def play_sound(sound_type: str = "default") -> None:
     """Joue un son selon l'OS."""
@@ -113,8 +124,13 @@ def play_sound(sound_type: str = "default") -> None:
                 subprocess.run(["powershell", "-c", "[console]::beep(400,200)"], 
                              check=False, timeout=3)
                 
-    except (subprocess.TimeoutExpired, FileNotFoundError):
-        # Fallback : bell
+    except subprocess.TimeoutExpired as e:
+        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
+            print(f"[notifications.py] Sound timeout: {e}", file=sys.stderr)
+        print("\a", end="", flush=True)
+    except FileNotFoundError as e:
+        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
+            print(f"[notifications.py] Sound command not found: {e.filename}", file=sys.stderr)
         print("\a", end="", flush=True)
 
 def main():

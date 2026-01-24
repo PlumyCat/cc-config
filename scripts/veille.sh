@@ -9,6 +9,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Configurable paths (can be overridden via environment variables)
+YOUTUBE_VEILLE_DIR="${YOUTUBE_VEILLE_DIR:-$HOME/projects/youtube-veille}"
+
 # Couleurs
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -100,7 +103,7 @@ quick_check() {
 }
 
 start_youtube_veille() {
-    local yt_dir="$HOME/projects/youtube-veille"
+    local yt_dir="$YOUTUBE_VEILLE_DIR"
 
     if [ ! -d "$yt_dir" ]; then
         echo -e "${YELLOW}[WARN]${NC} youtube-veille non installé"
@@ -135,7 +138,7 @@ start_youtube_veille() {
 }
 
 list_transcripts() {
-    local yt_dir="$HOME/projects/youtube-veille"
+    local yt_dir="$YOUTUBE_VEILLE_DIR"
     local db="$yt_dir/data/youtube-veille.db"
 
     if [ ! -f "$db" ]; then
@@ -162,7 +165,7 @@ rows.forEach(r => console.log('  📝 ' + r.title + ' (' + r.source + ', ' + r.d
 }
 
 list_veille_items() {
-    local yt_dir="$HOME/projects/youtube-veille"
+    local yt_dir="$YOUTUBE_VEILLE_DIR"
     local db="$yt_dir/data/youtube-veille.db"
 
     if [ ! -f "$db" ]; then
@@ -196,7 +199,7 @@ if (rows.length === 0) console.log('  (aucun item)');
 }
 
 mark_veille_item() {
-    local yt_dir="$HOME/projects/youtube-veille"
+    local yt_dir="$YOUTUBE_VEILLE_DIR"
     local id="$1"
     local status="$2"
 
@@ -217,7 +220,7 @@ console.log('Item $id marqué comme $status');
 }
 
 add_veille_item() {
-    local yt_dir="$HOME/projects/youtube-veille"
+    local yt_dir="$YOUTUBE_VEILLE_DIR"
     local title="$1"
     local source="${2:-manual}"
 
