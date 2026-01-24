@@ -43,9 +43,12 @@ Sources d'information et suivi des nouveautés.
 
 ### En attente de test
 
-| Date       | Feature     | Source                                                                 | Priorité |
-| ---------- | ----------- | ---------------------------------------------------------------------- | -------- |
-|            |             |                                                                        |          |
+| Date       | Feature                    | Source        | Priorité |
+| ---------- | -------------------------- | ------------- | -------- |
+| 2025-01-24 | Skill workflow type "Apex" | Melvynx       | 🔴 Haute |
+| 2025-01-24 | Skills.sh marketplace      | All About AI  | 🟡 Moyenne |
+| 2025-01-24 | Setting `toolSearch`       | Melvynx       | 🟡 Moyenne |
+| 2025-01-24 | Lighthouse auto via MCP    | Benjamin Code | 🟢 Basse |
 
 ### Testées (en experimental)
 
@@ -96,6 +99,49 @@ npm view @anthropic-ai/claude-code version
 ## Notes de veille
 
 <!-- Journal des découvertes -->
+
+### Semaine du 2025-01-24
+
+**Analyse YouTube Veille** (9 vidéos transcrites)
+
+#### 1. Chrome DevTools MCP (Benjamin Code)
+- Chrome DevTools MCP permet à Claude de contrôler entièrement le navigateur
+- Actions : cliquer, analyser console/network, lancer Lighthouse, optimiser SEO
+- Automatisation tâches web répétitives (ex: télécharger factures)
+- **Installation:** `npx @anthropic-ai/claude-code mcp add chrome-devtools`
+- **Prérequis:** Node.js 20.20+ minimum
+- ✅ Déjà installé (chrome-gui et chrome-devtools MCPs)
+
+#### 2. Skills & Workflows - Apex (Melvynx)
+- Les Skills permettent de charger du contexte dynamiquement
+- Workflow "Apex" : analyse → plan → execute → validate → examine → PR
+- Avantage : le prompt reste en fin de contexte (meilleure priorité)
+- Paramètres modulaires : `-a` (auto), `-x` (examine), `-pr` (pull request), `-t` (test)
+- Les fichiers sont chargés à la demande, pas tous d'un coup
+- 🔴 À tester - Créer un skill workflow inspiré d'Apex
+
+#### 3. Tool Search (Melvynx)
+- Nouvelle feature : `toolSearch` pour économiser le contexte MCP
+- Si beaucoup de MCPs (>2-3% contexte), activer `toolSearch: true`
+- Si peu de MCPs (<2%), le désactiver pour utilisation auto
+- Les `/commands` ont été fusionnées dans les Skills
+- 🟡 Vérifier le % de contexte MCP avec `/context`
+
+#### 4. Ralph Loop (All About AI)
+- Boucle autonome : PRD JSON → pick task → execute → validate → commit → reset
+- Chaque tâche = nouvelle instance Claude (contexte frais)
+- Mémoire via fichiers : `prd.json` + `progress.txt`
+- Mode `--dangerously-skip-permissions`
+- ✅ Skill déjà créé (ralph-loop:*)
+
+#### 5. Skills.sh Marketplace (All About AI)
+- Marketplace Vercel : [skills.sh](https://skills.sh)
+- Installation : `npx skills add vercel/react-best-practices`
+- Skills populaires : React best practices, Web design guidelines
+- Les skills sont par projet (pas globaux)
+- 🟡 Explorer et installer des skills utiles
+
+---
 
 ### Semaine du 2025-01-16
 
