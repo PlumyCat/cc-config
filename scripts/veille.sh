@@ -147,15 +147,92 @@ list_transcripts() {
     log "Transcriptions disponibles"
     echo "─────────────────────────────────────"
 
-    sqlite3 "$db" "
-        SELECT v.title, t.source, date(t.created_at, 'unixepoch') as date
-        FROM transcripts t
-        JOIN videos v ON t.video_id = v.id
-        ORDER BY t.created_at DESC
-        LIMIT 10;
-    " 2>/dev/null | while IFS='|' read -r title source date; do
-        echo "  📝 $title ($source, $date)"
-    done
+    cd "$yt_dir" && node -e "
+const Database = require('better-sqlite3');
+const db = new Database('./data/youtube-veille.db');
+const rows = db.prepare(\`
+  SELECT v.title, t.source, date(t.created_at, 'unixepoch') as date
+  FROM transcripts t
+  JOIN videos v ON t.video_id = v.id
+  ORDER BY t.created_at DESC
+  LIMIT 10
+\`).all();
+rows.forEach(r => console.log('  📝 ' + r.title + ' (' + r.source + ', ' + r.date + ')'));
+" 2>/dev/null
+}
+
+list_veille_items() {
+    local yt_dir="$HOME/projects/youtube-veille"
+    local db="$yt_dir/data/youtube-veille.db"
+
+    if [ ! -f "$db" ]; then
+        echo "  (pas d'items de veille)"
+        return
+    fi
+
+    echo ""
+    log "Items de veille"
+    echo "─────────────────────────────────────"
+
+    cd "$yt_dir" && node -e "
+const Database = require('better-sqlite3');
+const db = new Database('./data/youtube-veille.db');
+const rows = db.prepare(\`
+  SELECT id, title, status, source, date(created_at, 'unixepoch') as date
+  FROM veille_items
+  ORDER BY
+    CASE status
+      WHEN 'discovered' THEN 1
+      WHEN 'testing' THEN 2
+      WHEN 'applied' THEN 3
+      WHEN 'rejected' THEN 4
+    END,
+    created_at DESC
+\`).all();
+const icons = { discovered: '🆕', testing: '🧪', applied: '✅', rejected: '❌' };
+rows.forEach(r => console.log('  ' + (icons[r.status] || '❓') + ' [' + r.id + '] ' + r.title + ' (' + r.source + ')'));
+if (rows.length === 0) console.log('  (aucun item)');
+" 2>/dev/null
+}
+
+mark_veille_item() {
+    local yt_dir="$HOME/projects/youtube-veille"
+    local id="$1"
+    local status="$2"
+
+    if [ -z "$id" ] || [ -z "$status" ]; then
+        echo "Usage: veille.sh mark <id> <status>"
+        echo "Status: discovered, testing, applied, rejected"
+        return 1
+    fi
+
+    cd "$yt_dir" && node -e "
+const Database = require('better-sqlite3');
+const db = new Database('./data/youtube-veille.db');
+const now = Math.floor(Date.now() / 1000);
+const appliedAt = '$status' === 'applied' ? now : null;
+db.prepare('UPDATE veille_items SET status = ?, applied_at = ? WHERE id = ?').run('$status', appliedAt, $id);
+console.log('Item $id marqué comme $status');
+" 2>/dev/null
+}
+
+add_veille_item() {
+    local yt_dir="$HOME/projects/youtube-veille"
+    local title="$1"
+    local source="${2:-manual}"
+
+    if [ -z "$title" ]; then
+        echo "Usage: veille.sh add \"<title>\" [source]"
+        return 1
+    fi
+
+    cd "$yt_dir" && node -e "
+const Database = require('better-sqlite3');
+const db = new Database('./data/youtube-veille.db');
+const now = Math.floor(Date.now() / 1000);
+const result = db.prepare('INSERT INTO veille_items (title, source, status, created_at) VALUES (?, ?, ?, ?)').run('$title', '$source', 'discovered', now);
+console.log('Item ajouté avec ID: ' + result.lastInsertRowid);
+" 2>/dev/null
 }
 
 usage() {
@@ -168,6 +245,9 @@ Commands:
   version     Affiche uniquement les versions
   youtube     Lance youtube-veille (http://localhost:3000)
   transcripts Liste les transcriptions récentes
+  items       Liste les items de veille (features découvertes)
+  add <title> Ajoute un item de veille
+  mark <id> <status>  Change le statut (discovered/testing/applied/rejected)
 
 EOF
 }
@@ -177,6 +257,9 @@ case "${1:-}" in
     version)     show_current_version ;;
     youtube|yt)  start_youtube_veille ;;
     transcripts) list_transcripts ;;
+    items)       list_veille_items ;;
+    add)         add_veille_item "$2" "$3" ;;
+    mark)        mark_veille_item "$2" "$3" ;;
     -h|--help)   usage ;;
     *)           quick_check ;;
 esac

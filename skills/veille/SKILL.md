@@ -1,11 +1,10 @@
 ---
 name: veille
 description: Veille technologique Claude Code - versions, sources, YouTube transcripts et analyse des nouveautés
-argument-hint: "[youtube|analyze|open|version]"
+argument-hint: "[youtube|analyze|items|open|version]"
 allowed-tools: Bash, Read, Write, WebFetch
 context:
   - "~/cc-config/docs/veille.md"
-  - "~/projects/youtube-veille/data/youtube-veille.db"
 ---
 
 # Veille des nouveautés Claude Code
@@ -27,42 +26,61 @@ Affiche versions, sources et nouveautés en attente.
 - Démarre le serveur http://localhost:3000
 - Ouvre l'interface pour gérer chaînes et transcriptions
 
-### 3. Voir les transcriptions
+### 3. Voir les items de veille
 ```bash
-~/cc-config/scripts/veille.sh transcripts
+~/cc-config/scripts/veille.sh items
 ```
+Liste les features découvertes avec leur statut (🆕 discovered, 🧪 testing, ✅ applied, ❌ rejected)
 
 ### 4. Analyser les transcriptions (Claude)
 
 Quand l'utilisateur demande d'analyser les nouveautés :
 
-1. **Lire les transcriptions récentes** depuis la DB SQLite :
-   ```sql
-   SELECT v.title, v.id, t.content
-   FROM transcripts t
-   JOIN videos v ON t.video_id = v.id
-   WHERE v.status IN ('transcribed', 'read')
-   ORDER BY t.created_at DESC
-   LIMIT 5;
+1. **Vérifier les items existants** dans la table `veille_items` :
+   ```bash
+   cd ~/projects/youtube-veille && node -e "
+   const Database = require('better-sqlite3');
+   const db = new Database('./data/youtube-veille.db');
+   const items = db.prepare('SELECT title, status FROM veille_items').all();
+   console.log(JSON.stringify(items));
+   "
    ```
 
-2. **Extraire les points clés** de chaque transcription :
+2. **Lire les transcriptions récentes** :
+   ```bash
+   cd ~/projects/youtube-veille && node -e "
+   const Database = require('better-sqlite3');
+   const db = new Database('./data/youtube-veille.db');
+   const rows = db.prepare(\`
+     SELECT v.id, v.title, t.content
+     FROM transcripts t
+     JOIN videos v ON t.video_id = v.id
+     ORDER BY t.created_at DESC
+     LIMIT 5
+   \`).all();
+   console.log(JSON.stringify(rows));
+   "
+   ```
+
+3. **Extraire les points clés** (ignorer ceux déjà dans veille_items) :
    - Nouvelles fonctionnalités Claude Code
    - Bonnes pratiques mentionnées
    - Tips et astuces
-   - Changements d'API ou de comportement
 
-3. **Créer un rapport de veille** dans `~/cc-config/docs/veille.md` :
-   - Date et source (titre vidéo)
-   - Points clés résumés
-   - Actions à tester (si pertinent)
+4. **Ajouter les nouveaux items** à la DB :
+   ```bash
+   ~/cc-config/scripts/veille.sh add "Nom de la feature" "youtube"
+   ```
 
-4. **Proposer les prochaines étapes** :
-   - Ajouter au backlog les features à tester
-   - Créer une branche expérimentale si nécessaire
-   - Documenter dans CLAUDE.md si utile
+5. **Mettre à jour veille.md** avec le rapport
 
-### 5. Ouvrir les sources web
+### 5. Marquer un item comme appliqué
+```bash
+~/cc-config/scripts/veille.sh mark <id> applied
+```
+Statuts possibles : `discovered`, `testing`, `applied`, `rejected`
+
+### 6. Ouvrir les sources web
 ```bash
 ~/cc-config/scripts/veille.sh open
 ```
@@ -83,18 +101,17 @@ Quand l'utilisateur demande d'analyser les nouveautés :
 | Anthropic | Officiel |
 | AI Explained | News AI |
 | Matthew Berman | Reviews outils AI |
-| Prompt Engineering | Tutoriels |
 | All About AI | Demos pratiques |
-| Alex so yes (FR) | Dev & IA |
 | Melvyn X (FR) | Dev & IA |
 | Benjamin Code (FR) | Dev & IA |
 
 ## Workflow type
 
 ```
-/veille youtube          # Ouvrir l'app, ajouter vidéos, transcrire
-/veille analyze          # Analyser les transcripts et documenter
-/veille                  # Vérifier versions et sources
+/veille youtube          # Ouvrir l'app, transcrire des vidéos
+/veille analyze          # Analyser et ajouter à la DB
+/veille items            # Voir les features découvertes
+/veille mark 3 applied   # Marquer comme appliqué
 ```
 
 ## Base de données
@@ -103,3 +120,4 @@ La DB SQLite `~/projects/youtube-veille/data/youtube-veille.db` contient :
 - `channels` : Chaînes suivies
 - `videos` : Vidéos avec statut (new/transcribed/read)
 - `transcripts` : Contenu des transcriptions
+- `veille_items` : Features découvertes avec statut de suivi
