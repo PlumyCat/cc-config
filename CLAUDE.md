@@ -20,6 +20,8 @@ cc-config/
 │   ├── experimental.sh # Workflow de test des nouveautés
 │   ├── veille.sh       # Veille des nouveautés Claude Code
 │   └── note.sh         # Ajout rapide de notes
+├── mcp/                # MCP servers custom (locaux au projet)
+│   └── youtube-transcript/  # Extraction transcriptions YouTube
 ├── docs/               # Documentation personnelle
 │   ├── tips.md         # Trucs et astuces à retenir
 │   ├── usage.md        # Guide d'utilisation personnel
@@ -85,6 +87,15 @@ cc-config/
 ./scripts/note.sh tip "Ne pas oublier --resume"
 ./scripts/note.sh todo "Tester le nouveau hook"
 ```
+
+## Préférences d'outils
+
+| Tâche | Outil préféré | Au lieu de |
+|-------|---------------|------------|
+| Recherche web | `mcp__exa__web_search_exa` | WebSearch natif |
+| Recherche code | `mcp__exa__get_code_context_exa` | WebSearch |
+| Transcriptions YouTube | `mcp__youtube-transcript__*` | - |
+| Documentation libs | `mcp__context7__*` | WebSearch |
 
 ## Conventions
 

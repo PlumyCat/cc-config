@@ -4,7 +4,9 @@
     "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
     "USE_BUILTIN_RIPGREP": "0",
     "BASH_DEFAULT_TIMEOUT_MS": "30000",
-    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "0"
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "0",
+    "CLAUDE_CODE_ENABLE_TASKS": "true",
+    "ENABLE_TOOL_SEARCH": "false"
   },
   "includeCoAuthoredBy": true,
   "permissions": {

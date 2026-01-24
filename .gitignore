@@ -19,3 +19,8 @@ backups/
 # IDE
 .vscode/
 .idea/
+
+# MCP servers
+mcp/*/node_modules/
+mcp/*/package-lock.json
+mcp/*/cookies.txt

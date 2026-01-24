@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "youtube-transcript": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/home/eric/cc-config/mcp/youtube-transcript/index.js"
+      ],
+      "env": {}
+    }
+  }
+}
