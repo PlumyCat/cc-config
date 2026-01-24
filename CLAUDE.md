@@ -8,30 +8,47 @@ Configuration personnelle de Claude Code pour un usage professionnel.
 ```
 cc-config/
 ├── settings/           # Configuration principale (settings.json)
-├── skills/             # Skills personnalisées (répertoires avec SKILL.md)
-│   ├── pull/           # Git pull intelligent
-│   ├── veille/         # Veille des nouveautés
-│   ├── epct/           # Workflow Explore-Plan-Code-Test
-│   └── ...
+├── skills/             # Skills locales à ce projet
 ├── agents/             # Agents spécialisés (.md)
 ├── hooks/              # Scripts de hooks (notifications, etc.)
 ├── scripts/            # Scripts utilitaires
-│   ├── statusline.sh   # Barre de statut personnalisée
-│   ├── experimental.sh # Workflow de test des nouveautés
-│   ├── veille.sh       # Veille des nouveautés Claude Code
-│   └── note.sh         # Ajout rapide de notes
 ├── mcp/                # MCP servers custom (locaux au projet)
 │   └── youtube-transcript/  # Extraction transcriptions YouTube
 ├── docs/               # Documentation personnelle
-│   ├── tips.md         # Trucs et astuces à retenir
-│   ├── usage.md        # Guide d'utilisation personnel
-│   ├── changelog.md    # Historique des modifications
-│   ├── backlog.md      # Idées et choses à tester
-│   └── veille.md       # Suivi des nouveautés
 ├── experimental/       # Tests en cours (branche exp/*)
 ├── install.sh          # Script d'installation
 └── CLAUDE.md           # Ce fichier
 ```
+
+## Skills
+
+### Skills locales (ce projet)
+
+| Skill | Description |
+|-------|-------------|
+| `apex` | Workflow Apex |
+| `cc-install` | Installation de la config Claude Code |
+| `create-mcp-server` | Création de serveurs MCP |
+| `debug-mcp` | Debug de serveurs MCP |
+| `epct` | Workflow Explore-Plan-Code-Test |
+| `experimental` | Workflow de test des nouveautés |
+| `feature-new` | Nouvelle feature |
+| `feature-resume` | Reprendre une feature |
+| `note` | Ajout rapide de notes |
+| `pull` | Git pull avec gestion des conflits |
+| `review-security` | Audit de sécurité |
+| `setup-fastapi` | Setup projet FastAPI |
+| `setup-nextjs` | Setup projet Next.js |
+| `skill-creator` | Création de nouvelles skills |
+| `veille` | Veille des nouveautés Claude Code |
+
+### Skills globales (~/.claude/skills/)
+
+Les skills globales sont stockées dans `~/.claude/skills/` et disponibles dans tous les projets :
+- claude-md-improver, context7, docker-expert, mermaid-diagrams
+- orchestration-prompts, python-pro, python-testing-patterns
+- ralph-tui-create-json, ralph-tui-prd, senior-architect
+- typescript-expert, vercel-react-best-practices
 
 ## Scripts disponibles
 
