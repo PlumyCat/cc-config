@@ -1,38 +1,71 @@
 ---
 name: veille
-description: Affiche les informations de veille Claude Code, versions actuelles et sources à consulter. Utiliser quand on parle de nouveautés, mises à jour, ou changelog.
-argument-hint: "[open|version]"
-allowed-tools: Bash, Read
+description: Veille technologique Claude Code - versions, sources, YouTube transcripts et analyse des nouveautés
+argument-hint: "[youtube|analyze|open|version]"
+allowed-tools: Bash, Read, Write, WebFetch
 context:
   - "~/cc-config/docs/veille.md"
+  - "~/projects/youtube-veille/data/youtube-veille.db"
 ---
 
 # Veille des nouveautés Claude Code
 
-Affiche les informations de veille et les sources à consulter.
+Workflow complet de veille technologique : sources, vidéos YouTube et analyse.
 
-## Actions
+## Actions disponibles
 
-### Résumé rapide (défaut)
+### 1. Résumé rapide (défaut)
 ```bash
 ~/cc-config/scripts/veille.sh
 ```
-- Version actuelle de Claude Code
-- Dernière version disponible sur npm
-- Sources de veille complètes
+Affiche versions, sources et nouveautés en attente.
 
-### Ouvrir les sources
+### 2. Lancer YouTube Veille
+```bash
+~/cc-config/scripts/veille.sh youtube
+```
+- Démarre le serveur http://localhost:3000
+- Ouvre l'interface pour gérer chaînes et transcriptions
+
+### 3. Voir les transcriptions
+```bash
+~/cc-config/scripts/veille.sh transcripts
+```
+
+### 4. Analyser les transcriptions (Claude)
+
+Quand l'utilisateur demande d'analyser les nouveautés :
+
+1. **Lire les transcriptions récentes** depuis la DB SQLite :
+   ```sql
+   SELECT v.title, v.id, t.content
+   FROM transcripts t
+   JOIN videos v ON t.video_id = v.id
+   WHERE v.status IN ('transcribed', 'read')
+   ORDER BY t.created_at DESC
+   LIMIT 5;
+   ```
+
+2. **Extraire les points clés** de chaque transcription :
+   - Nouvelles fonctionnalités Claude Code
+   - Bonnes pratiques mentionnées
+   - Tips et astuces
+   - Changements d'API ou de comportement
+
+3. **Créer un rapport de veille** dans `~/cc-config/docs/veille.md` :
+   - Date et source (titre vidéo)
+   - Points clés résumés
+   - Actions à tester (si pertinent)
+
+4. **Proposer les prochaines étapes** :
+   - Ajouter au backlog les features à tester
+   - Créer une branche expérimentale si nécessaire
+   - Documenter dans CLAUDE.md si utile
+
+### 5. Ouvrir les sources web
 ```bash
 ~/cc-config/scripts/veille.sh open
 ```
-
-### Juste les versions
-```bash
-~/cc-config/scripts/veille.sh version
-```
-
-### Afficher les notes de veille
-Lire `~/cc-config/docs/veille.md` pour voir l'historique complet.
 
 ## Sources officielles
 
@@ -41,34 +74,32 @@ Lire `~/cc-config/docs/veille.md` pour voir l'historique complet.
 | Changelog officiel | https://docs.anthropic.com/en/docs/claude-code/changelog |
 | GitHub Releases | https://github.com/anthropics/claude-code/releases |
 | Blog Anthropic | https://www.anthropic.com/news |
-| Discord Anthropic | https://discord.gg/anthropic |
 | npm | https://www.npmjs.com/package/@anthropic-ai/claude-code |
 
-## Sources communautaires
-
-| Source | URL |
-|--------|-----|
-| Reddit r/ClaudeAI | https://reddit.com/r/ClaudeAI |
-| Twitter/X #ClaudeCode | https://x.com/search?q=claudecode |
-| GitHub Issues | https://github.com/anthropics/claude-code/issues |
-
-## Chaînes YouTube
+## Chaînes YouTube (configurées dans youtube-veille)
 
 | Chaîne | Focus |
 |--------|-------|
-| [Anthropic](https://www.youtube.com/@anthropic-ai) | Officiel |
-| [AI Explained](https://www.youtube.com/@aiexplained-official) | News AI |
-| [Matthew Berman](https://www.youtube.com/@matthew_berman) | Reviews outils AI |
-| [Prompt Engineering](https://www.youtube.com/@PromptEngineering) | Tutoriels |
-| [All About AI](https://www.youtube.com/@AllAboutAI) | Demos pratiques |
-| [Alex so yes](https://www.youtube.com/@alexsoyes) | Dev & IA (FR) |
-| [Melvyn X](https://www.youtube.com/@melvynxdev) | Dev & IA (FR) |
-| [Benjamin Code](https://www.youtube.com/@BenjaminCode) | Dev & IA (FR) |
+| Anthropic | Officiel |
+| AI Explained | News AI |
+| Matthew Berman | Reviews outils AI |
+| Prompt Engineering | Tutoriels |
+| All About AI | Demos pratiques |
+| Alex so yes (FR) | Dev & IA |
+| Melvyn X (FR) | Dev & IA |
+| Benjamin Code (FR) | Dev & IA |
 
-## Documentation complète
+## Workflow type
 
-Le fichier `~/cc-config/docs/veille.md` (chargé en contexte) contient :
-- Historique des nouveautés testées et adoptées
-- Notes de veille détaillées
-- Process de veille hebdomadaire
-- Documentation BMAD Method
+```
+/veille youtube          # Ouvrir l'app, ajouter vidéos, transcrire
+/veille analyze          # Analyser les transcripts et documenter
+/veille                  # Vérifier versions et sources
+```
+
+## Base de données
+
+La DB SQLite `~/projects/youtube-veille/data/youtube-veille.db` contient :
+- `channels` : Chaînes suivies
+- `videos` : Vidéos avec statut (new/transcribed/read)
+- `transcripts` : Contenu des transcriptions

@@ -99,21 +99,84 @@ quick_check() {
     echo "  ./scripts/experimental.sh start <nom>  # Tester une nouveauté"
 }
 
+start_youtube_veille() {
+    local yt_dir="$HOME/projects/youtube-veille"
+
+    if [ ! -d "$yt_dir" ]; then
+        echo -e "${YELLOW}[WARN]${NC} youtube-veille non installé"
+        echo "       Repo: ~/projects/youtube-veille"
+        return 1
+    fi
+
+    echo ""
+    log "Lancement de YouTube Veille..."
+
+    # Vérifier si déjà en cours
+    if lsof -i :3000 &>/dev/null; then
+        info "Serveur déjà actif sur http://localhost:3000"
+    else
+        cd "$yt_dir"
+        npm run dev &>/dev/null &
+        sleep 2
+        info "Serveur démarré sur http://localhost:3000"
+    fi
+
+    # Ouvrir dans le navigateur
+    local open_cmd=""
+    if command -v xdg-open &> /dev/null; then
+        open_cmd="xdg-open"
+    elif command -v open &> /dev/null; then
+        open_cmd="open"
+    fi
+
+    if [ -n "$open_cmd" ]; then
+        $open_cmd "http://localhost:3000" 2>/dev/null &
+    fi
+}
+
+list_transcripts() {
+    local yt_dir="$HOME/projects/youtube-veille"
+    local db="$yt_dir/data/youtube-veille.db"
+
+    if [ ! -f "$db" ]; then
+        echo "  (pas de transcriptions)"
+        return
+    fi
+
+    echo ""
+    log "Transcriptions disponibles"
+    echo "─────────────────────────────────────"
+
+    sqlite3 "$db" "
+        SELECT v.title, t.source, date(t.created_at, 'unixepoch') as date
+        FROM transcripts t
+        JOIN videos v ON t.video_id = v.id
+        ORDER BY t.created_at DESC
+        LIMIT 10;
+    " 2>/dev/null | while IFS='|' read -r title source date; do
+        echo "  📝 $title ($source, $date)"
+    done
+}
+
 usage() {
     cat << EOF
 Usage: $0 [command]
 
 Commands:
-  (aucun)   Affiche un résumé de veille
-  open      Ouvre les sources dans le navigateur
-  version   Affiche uniquement les versions
+  (aucun)     Affiche un résumé de veille
+  open        Ouvre les sources dans le navigateur
+  version     Affiche uniquement les versions
+  youtube     Lance youtube-veille (http://localhost:3000)
+  transcripts Liste les transcriptions récentes
 
 EOF
 }
 
 case "${1:-}" in
-    open)     open_sources ;;
-    version)  show_current_version ;;
-    -h|--help) usage ;;
-    *)        quick_check ;;
+    open)        open_sources ;;
+    version)     show_current_version ;;
+    youtube|yt)  start_youtube_veille ;;
+    transcripts) list_transcripts ;;
+    -h|--help)   usage ;;
+    *)           quick_check ;;
 esac
