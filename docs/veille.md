@@ -45,7 +45,7 @@ Sources d'information et suivi des nouveautés.
 
 | Date       | Feature                    | Source        | Priorité |
 | ---------- | -------------------------- | ------------- | -------- |
-| 2025-01-24 | Skill workflow type "Apex" | Melvynx       | 🔴 Haute |
+| ~~2025-01-24~~ | ~~Skill workflow type "Apex"~~ | ~~Melvynx~~ | ✅ Fait |
 | 2025-01-24 | Skills.sh marketplace      | All About AI  | 🟡 Moyenne |
 | 2025-01-24 | Setting `toolSearch`       | Melvynx       | 🟡 Moyenne |
 | 2025-01-24 | Lighthouse auto via MCP    | Benjamin Code | 🟢 Basse |
@@ -118,7 +118,7 @@ npm view @anthropic-ai/claude-code version
 - Avantage : le prompt reste en fin de contexte (meilleure priorité)
 - Paramètres modulaires : `-a` (auto), `-x` (examine), `-pr` (pull request), `-t` (test)
 - Les fichiers sont chargés à la demande, pas tous d'un coup
-- 🔴 À tester - Créer un skill workflow inspiré d'Apex
+- ✅ Skill créé : `/apex <description> [-a] [-t] [-x] [-pr]`
 
 #### 3. Tool Search (Melvynx)
 - Nouvelle feature : `toolSearch` pour économiser le contexte MCP
