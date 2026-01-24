@@ -1,32 +1,38 @@
-# /note - Ajout rapide de notes
+---
+name: note
+description: Ajout rapide de notes dans la documentation personnelle (tips, todo, veille, changelog)
+disable-model-invocation: true
+argument-hint: "<tip|todo|veille|changelog> \"message\""
+allowed-tools: Bash
+---
+
+# Ajout rapide de notes
 
 Ajoute rapidement une note dans la documentation personnelle.
 
-## Instructions
-
-Selon le type de note demandé, exécute la commande appropriée :
+## Types de notes
 
 ### Ajouter un tip (truc à retenir)
 ```bash
-~/cc-config/scripts/note.sh tip "Le message"
+~/cc-config/scripts/note.sh tip "$ARGUMENTS"
 ```
 → Ajoute dans `docs/tips.md`
 
 ### Ajouter une tâche au backlog
 ```bash
-~/cc-config/scripts/note.sh todo "Le message"
+~/cc-config/scripts/note.sh todo "$ARGUMENTS"
 ```
 → Ajoute dans `docs/backlog.md`
 
 ### Ajouter une note de veille
 ```bash
-~/cc-config/scripts/note.sh veille "Le message"
+~/cc-config/scripts/note.sh veille "$ARGUMENTS"
 ```
 → Ajoute dans `docs/veille.md`
 
 ### Ajouter une entrée changelog
 ```bash
-~/cc-config/scripts/note.sh changelog "Le message"
+~/cc-config/scripts/note.sh changelog "$ARGUMENTS"
 ```
 → Ajoute dans `docs/changelog.md`
 

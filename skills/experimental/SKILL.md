@@ -1,14 +1,20 @@
-# /experimental - Workflow de test des nouveautés
+---
+name: experimental
+description: Gestion des branches expérimentales pour tester les nouvelles features Claude Code
+disable-model-invocation: true
+argument-hint: "<start|status|validate|rollback|list> [nom-feature]"
+allowed-tools: Bash
+---
+
+# Workflow de test des nouveautés
 
 Gère les branches expérimentales pour tester les nouvelles features Claude Code avant de les adopter.
 
-## Instructions
-
-Selon l'argument passé, exécute la commande appropriée :
+## Commandes disponibles
 
 ### Démarrer un test
 ```bash
-~/cc-config/scripts/experimental.sh start <nom-feature>
+~/cc-config/scripts/experimental.sh start $ARGUMENTS
 ```
 - Crée une branche `exp/<nom-feature>`
 - Permet de modifier la config en isolation

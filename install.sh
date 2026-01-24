@@ -80,7 +80,7 @@ if [ "$DO_BACKUP" = true ]; then
     log "Création du backup dans $BACKUP_DIR"
     run "mkdir -p '$BACKUP_DIR'"
     [ -f "$CLAUDE_DIR/settings.json" ] && run "cp '$CLAUDE_DIR/settings.json' '$BACKUP_DIR/'"
-    [ -d "$CLAUDE_DIR/commands" ] && run "cp -r '$CLAUDE_DIR/commands' '$BACKUP_DIR/'"
+    [ -d "$CLAUDE_DIR/skills" ] && run "cp -r '$CLAUDE_DIR/skills' '$BACKUP_DIR/'"
     [ -d "$CLAUDE_DIR/agents" ] && run "cp -r '$CLAUDE_DIR/agents' '$BACKUP_DIR/'"
     [ -d "$CLAUDE_DIR/hooks" ] && run "cp -r '$CLAUDE_DIR/hooks' '$BACKUP_DIR/'"
 fi
@@ -89,7 +89,7 @@ log "Installation de la configuration Claude Code..."
 
 # Créer les dossiers nécessaires
 log "Création des dossiers..."
-run "mkdir -p '$CLAUDE_DIR/commands'"
+run "mkdir -p '$CLAUDE_DIR/skills'"
 run "mkdir -p '$CLAUDE_DIR/agents'"
 run "mkdir -p '$CLAUDE_DIR/hooks'"
 
@@ -99,10 +99,14 @@ if [ -f "$SCRIPT_DIR/settings/settings.json" ]; then
     run "cp '$SCRIPT_DIR/settings/settings.json' '$CLAUDE_DIR/settings.json'"
 fi
 
-# Copier les commands
-if [ -d "$SCRIPT_DIR/commands" ] && [ "$(ls -A $SCRIPT_DIR/commands 2>/dev/null)" ]; then
-    log "Installation des commands..."
-    run "cp '$SCRIPT_DIR/commands/'*.md '$CLAUDE_DIR/commands/'"
+# Copier les skills (nouvelle structure)
+if [ -d "$SCRIPT_DIR/skills" ] && [ "$(ls -A $SCRIPT_DIR/skills 2>/dev/null)" ]; then
+    log "Installation des skills..."
+    for skill_dir in "$SCRIPT_DIR/skills/"*/; do
+        skill_name=$(basename "$skill_dir")
+        run "mkdir -p '$CLAUDE_DIR/skills/$skill_name'"
+        run "cp -r '$skill_dir'* '$CLAUDE_DIR/skills/$skill_name/'"
+    done
 fi
 
 # Copier les agents
@@ -142,7 +146,10 @@ log "Installation terminée!"
 echo ""
 echo "=== Résumé ==="
 echo "Settings:  $(ls $SCRIPT_DIR/settings/*.json 2>/dev/null | wc -l) fichier(s)"
-echo "Commands:  $(ls $SCRIPT_DIR/commands/*.md 2>/dev/null | wc -l) fichier(s)"
+echo "Skills:    $(ls -d $SCRIPT_DIR/skills/*/ 2>/dev/null | wc -l) skill(s)"
 echo "Agents:    $(ls $SCRIPT_DIR/agents/*.md 2>/dev/null | wc -l) fichier(s)"
 echo "Hooks:     $(ls $SCRIPT_DIR/hooks/* 2>/dev/null | wc -l) fichier(s)"
 echo "Scripts:   $(ls $SCRIPT_DIR/scripts/* 2>/dev/null | wc -l) fichier(s)"
+
+echo ""
+echo "Redémarrez Claude Code pour appliquer les changements."

@@ -8,7 +8,11 @@ Configuration personnelle de Claude Code pour un usage professionnel.
 ```
 cc-config/
 ├── settings/           # Configuration principale (settings.json)
-├── commands/           # Commandes slash personnalisées (.md)
+├── skills/             # Skills personnalisées (répertoires avec SKILL.md)
+│   ├── pull/           # Git pull intelligent
+│   ├── veille/         # Veille des nouveautés
+│   ├── epct/           # Workflow Explore-Plan-Code-Test
+│   └── ...
 ├── agents/             # Agents spécialisés (.md)
 ├── hooks/              # Scripts de hooks (notifications, etc.)
 ├── scripts/            # Scripts utilitaires
@@ -89,9 +93,11 @@ cc-config/
 - Hooks: organisés par événement (`Stop`, `Notification`)
 - Mode par défaut: `acceptEdits`
 
-### Commands
-- Un fichier `.md` par commande dans `commands/`
-- Nom du fichier = nom de la commande (sans `/`)
+### Skills (nouveau format)
+- Un répertoire par skill dans `skills/`
+- Chaque skill contient un fichier `SKILL.md` avec frontmatter YAML
+- Frontmatter supporté: `name`, `description`, `disable-model-invocation`, `allowed-tools`, `context`, `agent`, `argument-hint`
+- Fichiers de support optionnels (templates, scripts, exemples)
 
 ### Agents
 - Un fichier `.md` par agent dans `agents/`

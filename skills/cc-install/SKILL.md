@@ -1,10 +1,16 @@
-# /cc-install - Installation de la config Claude Code
+---
+name: cc-install
+description: Installation de la configuration Claude Code depuis cc-config vers ~/.claude
+disable-model-invocation: true
+argument-hint: "[--backup] [--dry-run] [--mcp]"
+allowed-tools: Bash
+---
+
+# Installation de la config Claude Code
 
 Installe la configuration depuis le dépôt cc-config vers ~/.claude.
 
-## Instructions
-
-Exécute le script d'installation avec les options appropriées :
+## Commandes
 
 ### Installation standard
 ```bash
@@ -34,7 +40,7 @@ Exécute le script d'installation avec les options appropriées :
 ## Ce qui est installé
 
 - `settings.json` → `~/.claude/settings.json`
-- `commands/*.md` → `~/.claude/commands/`
+- `skills/*/SKILL.md` → `~/.claude/skills/`
 - `agents/*.md` → `~/.claude/agents/`
 - `hooks/*` → `~/.claude/hooks/`
 
