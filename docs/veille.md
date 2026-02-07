@@ -198,9 +198,6 @@ Framework open-source avec agents spécialisés qui guident le développement lo
 
 ---
 
-### Note 2026-01-29
-- ClawdBOT/MoltBot - Bot Telegram pour contrôler ordi à distance via Claude. Killer feature: mémoire infinie + notifications proactives + contrôle Chrome sessions. Attention sécurité: gateway ouvert, données vers serveurs Claude. Setup: curl moldbots.sh/install
-
 ---
 
 ### Semaine du 2026-02-07
