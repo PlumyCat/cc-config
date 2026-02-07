@@ -26,8 +26,10 @@ cc-config/
 
 | Skill | Description |
 |-------|-------------|
+| `agent-teams` | Reference Agent Teams (multi-agents paralleles natifs) |
 | `apex` | Workflow Apex |
 | `cc-install` | Installation de la config Claude Code |
+| `cleanup` | Diagnostic et nettoyage des processus Claude bloqués |
 | `create-mcp-server` | Création de serveurs MCP |
 | `debug-mcp` | Debug de serveurs MCP |
 | `epct` | Workflow Explore-Plan-Code-Test |

@@ -145,29 +145,49 @@ def main():
         if hook_event == "Stop":
             # Tâche terminée
             send_notification(
-                "Claude Code", 
+                "Claude Code",
                 "✅ Task completed successfully!"
             )
             play_sound("finish")
-            
+
         elif hook_event == "Notification":
             # Claude attend une interaction
             event_data = input_data.get('event_data', {})
             event_type = event_data.get('event', 'permission_needed')
-            
+
             if event_type == "permission_needed":
                 send_notification(
-                    "Claude Code", 
+                    "Claude Code",
                     "🔐 Waiting for your permission..."
                 )
                 play_sound("attention")
             else:
                 send_notification(
-                    "Claude Code", 
+                    "Claude Code",
                     "⏰ Waiting for your input..."
                 )
                 play_sound("attention")
-        
+
+        elif hook_event == "TeammateIdle":
+            # Agent Teams: un teammate est idle
+            event_data = input_data.get('event_data', {})
+            teammate_name = event_data.get('teammate_name', 'unknown')
+            send_notification(
+                "Agent Teams",
+                f"💤 Teammate '{teammate_name}' is idle"
+            )
+            play_sound("attention")
+
+        elif hook_event == "TaskCompleted":
+            # Agent Teams: une tâche est terminée
+            event_data = input_data.get('event_data', {})
+            task_subject = event_data.get('subject', event_data.get('task_name', 'unknown'))
+            send_notification(
+                "Agent Teams",
+                f"✅ Task completed: {task_subject}"
+            )
+            play_sound("finish")
+
         sys.exit(0)
         
     except json.JSONDecodeError:

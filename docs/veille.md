@@ -45,16 +45,19 @@ Sources d'information et suivi des nouveautés.
 
 | Date       | Feature                    | Source        | Priorité |
 | ---------- | -------------------------- | ------------- | -------- |
+| ~~2026-02-07~~ | ~~Agent Teams (Swarms)~~ | ~~Melvynx/Bart~~ | ✅ Migre |
+| 2026-02-07 | AIBlueprint CLI            | Melvynx       | 🟡 Moyenne |
+| 2026-02-07 | claude-mem (persistance)   | Better Stack  | 🟢 Basse |
 | ~~2025-01-24~~ | ~~Skill workflow type "Apex"~~ | ~~Melvynx~~ | ✅ Fait |
 | 2025-01-24 | Skills.sh marketplace      | All About AI  | 🟡 Moyenne |
-| 2025-01-24 | Setting `toolSearch`       | Melvynx       | 🟡 Moyenne |
+| ~~2025-01-24~~ | ~~Setting `toolSearch`~~   | ~~Melvynx~~   | ✅ Auto |
 | 2025-01-24 | Lighthouse auto via MCP    | Benjamin Code | 🟢 Basse |
 
 ### Testées (en experimental)
 
 | Date | Feature | Résultat | Action |
 | ---- | ------- | -------- | ------ |
-|      |         |          |        |
+| 2026-02-07 | Agent Teams (Swarms) | Remplace claude-prophet (MCBS) | Skill `agent-teams` creee, env var activee |
 
 ### Adoptées
 
@@ -194,3 +197,63 @@ Framework open-source avec agents spécialisés qui guident le développement lo
 | Discord | discord.gg/gk8jAdXWmj |
 
 ---
+
+### Note 2026-01-29
+- ClawdBOT/MoltBot - Bot Telegram pour contrôler ordi à distance via Claude. Killer feature: mémoire infinie + notifications proactives + contrôle Chrome sessions. Attention sécurité: gateway ouvert, données vers serveurs Claude. Setup: curl moldbots.sh/install
+
+---
+
+### Semaine du 2026-02-07
+
+**Veille YouTube** (3 vidéos analysées)
+
+#### 1. Agent Teams / Swarms (Melvynx + Bart Slodyczka)
+- **Feature expérimentale Opus 4.6** : multi-agents coordonnés en parallèle
+- Un **lead agent** orchestre, découpe les tâches et dispatche à des **teammates**
+- Communication inter-agents via **mailbox** + **shared task list** avec dépendances (DAG)
+- 2 modes d'affichage : **in-process** (Shift+Up/Down) ou **split panes** (tmux/iTerm2)
+- **Delegate mode** (Shift+Tab) : empêche le lead de coder, coordination only
+- **Plan approval** : exiger validation du plan avant implémentation
+- **Hooks** : `TeammateIdle` (exit 2 = keep working) + `TaskCompleted` (exit 2 = reject)
+- Activation : `"env": { "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1" }` dans settings.json
+- Stockage local : `~/.claude/teams/{name}/config.json` + `~/.claude/tasks/{name}/`
+- **Différence avec subagents** : teammates communiquent entre eux (pas juste retour au caller)
+- **Coût tokens** : ~5x pour 5 agents (chacun a son propre contexte)
+- **Limitations** : pas de /resume, 1 team/session, pas de nested teams, split panes = tmux/iTerm2 only
+- **Best practices** : 5-6 tasks/teammate, chaque teammate = ses propres fichiers, commencer par review
+- **Cas d'usage** : code review parallèle, debug par hypothèses concurrentes, feature cross-layer
+- 🔴 **À tester en priorité** - Remplace notre système claude-prophet
+- Sources : [Doc officielle](https://code.claude.com/docs/en/agent-teams) | [Melvynx vidéo](https://www.youtube.com/watch?v=LuB6ZJI1wYo) | [Bart vidéo](https://www.youtube.com/watch?v=VWngYUC63po)
+
+#### 2. MCP Tool Search (Melvynx - jan 2026)
+- Problème : MCP tools polluent le contexte (GitHub MCP = 46k tokens / 91 tools = 41% du contexte)
+- Solution : **lazy loading** - Claude charge uniquement les tools nécessaires à la volée
+- S'active auto quand définitions > 10k tokens
+- Recherche par **regex** ou **BM25** (sémantique)
+- **-85% tokens** consommés (77k -> 8.7k)
+- Accuracy : Opus 4 de 49% à 74%, Opus 4.5 de 79.5% à 88.1%
+- Vérifiable via `/context` et `/doctor`
+- ✅ Déjà actif (automatique avec nos MCPs)
+- Source : [Melvynx vidéo](https://www.youtube.com/watch?v=jjvAveQoAqE)
+
+#### 3. Tasks (v2.1.16 - jan 2026)
+- Remplacement des "Todos" éphémères par des **Tasks persistantes**
+- 3 états : pending, in_progress, completed
+- **Dependency graph (DAG)** : une task peut bloquer une autre
+- Collaboration entre sessions et subagents
+- Base du système Agent Teams
+- ✅ Déjà utilisé dans nos workflows
+
+#### Autres vidéos notables repérées
+- **Y Combinator** : "How To Get The Most Out Of Coding Agents" (46 min, 13h)
+- **Academind** : "My top 6 tips & ways of using Claude Code efficiently" (57K vues, 9j)
+- **Greg Isenberg** : "Claude Code Clearly Explained" (184K vues, 2 sem) - mentionne Ralph loops
+- **Max Schwarzmüller** : Comparaison Claude Code vs OpenCode vs Cursor vs GitHub Copilot (38K vues, 8j)
+- **Better Stack** : "Claude Keeps Forgetting Your Code" - plugin claude-mem (7.1K vues, 16h)
+- **Melvynx** : AIBlueprint CLI - concurrent/complément de notre cc-config
+
+#### Actions
+- ✅ Agent Teams active - remplace claude-prophet (MCBS supprime)
+- 🟡 Explorer AIBlueprint de Melvynx (https://github.com/Melvynx/aiblueprint)
+- 🟡 Regarder la vidéo Y Combinator sur les coding agents
+- 🟢 Vérifier claude-mem pour la persistance mémoire
