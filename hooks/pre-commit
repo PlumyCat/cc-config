@@ -67,7 +67,7 @@ for file in $staged_files; do
 
     # Check each pattern
     for pattern in "${SECRET_PATTERNS[@]}"; do
-        if git diff --cached "$file" 2>/dev/null | grep -qiE "$pattern"; then
+        if git diff --cached "$file" 2>/dev/null | grep -qiE -- "$pattern"; then
             echo -e "${RED}[BLOCKED]${NC} Potential secret found in: $file"
             echo -e "${YELLOW}Pattern:${NC} $pattern"
             found_secrets=true
