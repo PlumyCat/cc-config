@@ -12,8 +12,6 @@ cc-config/
 ├── agents/             # Agents spécialisés (.md)
 ├── hooks/              # Scripts de hooks (notifications, etc.)
 ├── scripts/            # Scripts utilitaires
-├── mcp/                # MCP servers custom (locaux au projet)
-│   └── youtube-transcript/  # Extraction transcriptions YouTube
 ├── docs/               # Documentation personnelle
 ├── experimental/       # Tests en cours (branche exp/*)
 ├── install.sh          # Script d'installation
@@ -113,7 +111,6 @@ Les skills globales sont stockées dans `~/.claude/skills/` et disponibles dans 
 |-------|---------------|------------|
 | Recherche web | `mcp__exa__web_search_exa` | WebSearch natif |
 | Recherche code | `mcp__exa__get_code_context_exa` | WebSearch |
-| Transcriptions YouTube | `mcp__youtube-transcript__*` | - |
 | Documentation libs | `mcp__context7__*` | WebSearch |
 
 ## Conventions
@@ -142,3 +139,7 @@ Les skills globales sont stockées dans `~/.claude/skills/` et disponibles dans 
 | `docs/changelog.md` | Historique des modifs |
 | `docs/backlog.md` | Idées à tester |
 | `docs/veille.md` | Suivi des nouveautés |
+| `docs/agent-teams.md` | Guide Agent Teams (multi-agents paralleles) |
+| `docs/apex.md` | Guide workflow Apex (Analyze-Plan-Execute-Validate) |
+| `docs/bmad.md` | Guide BMAD Method v6 (methodologie agile IA) |
+| `docs/ralph.md` | Guide Ralph (orchestration autonome de taches) |

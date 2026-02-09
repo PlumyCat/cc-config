@@ -74,23 +74,12 @@ def send_notification(title: str, message: str) -> None:
                 ps_script
             ], check=False, timeout=10)
             
-    except subprocess.TimeoutExpired as e:
-        # Log timeout error to stderr for debugging
-        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
-            print(f"[notifications.py] Timeout: {e}", file=sys.stderr)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
         # Fallback : bell system
-        print("\a", end="", flush=True)
-    except FileNotFoundError as e:
-        # Log missing command to stderr for debugging
-        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
-            print(f"[notifications.py] Command not found: {e.filename}", file=sys.stderr)
-        # Fallback : bell system
-        print("\a", end="", flush=True)
-    except Exception as e:
-        # Log unexpected errors
-        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
-            print(f"[notifications.py] Error: {type(e).__name__}: {e}", file=sys.stderr)
-        print("\a", end="", flush=True)
+        try:
+            print("\a", end="", flush=True)  # Bell character
+        except:
+            pass
 
 def play_sound(sound_type: str = "default") -> None:
     """Joue un son selon l'OS."""
@@ -124,13 +113,8 @@ def play_sound(sound_type: str = "default") -> None:
                 subprocess.run(["powershell", "-c", "[console]::beep(400,200)"], 
                              check=False, timeout=3)
                 
-    except subprocess.TimeoutExpired as e:
-        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
-            print(f"[notifications.py] Sound timeout: {e}", file=sys.stderr)
-        print("\a", end="", flush=True)
-    except FileNotFoundError as e:
-        if os.environ.get('CLAUDE_HOOKS_DEBUG'):
-            print(f"[notifications.py] Sound command not found: {e.filename}", file=sys.stderr)
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        # Fallback : bell
         print("\a", end="", flush=True)
 
 def main():
@@ -145,49 +129,29 @@ def main():
         if hook_event == "Stop":
             # Tâche terminée
             send_notification(
-                "Claude Code",
+                "Claude Code", 
                 "✅ Task completed successfully!"
             )
             play_sound("finish")
-
+            
         elif hook_event == "Notification":
             # Claude attend une interaction
             event_data = input_data.get('event_data', {})
             event_type = event_data.get('event', 'permission_needed')
-
+            
             if event_type == "permission_needed":
                 send_notification(
-                    "Claude Code",
+                    "Claude Code", 
                     "🔐 Waiting for your permission..."
                 )
                 play_sound("attention")
             else:
                 send_notification(
-                    "Claude Code",
+                    "Claude Code", 
                     "⏰ Waiting for your input..."
                 )
                 play_sound("attention")
-
-        elif hook_event == "TeammateIdle":
-            # Agent Teams: un teammate est idle
-            event_data = input_data.get('event_data', {})
-            teammate_name = event_data.get('teammate_name', 'unknown')
-            send_notification(
-                "Agent Teams",
-                f"💤 Teammate '{teammate_name}' is idle"
-            )
-            play_sound("attention")
-
-        elif hook_event == "TaskCompleted":
-            # Agent Teams: une tâche est terminée
-            event_data = input_data.get('event_data', {})
-            task_subject = event_data.get('subject', event_data.get('task_name', 'unknown'))
-            send_notification(
-                "Agent Teams",
-                f"✅ Task completed: {task_subject}"
-            )
-            play_sound("finish")
-
+        
         sys.exit(0)
         
     except json.JSONDecodeError:

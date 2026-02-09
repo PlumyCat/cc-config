@@ -1,123 +1,148 @@
 ---
 name: veille
-description: Veille technologique Claude Code - versions, sources, YouTube transcripts et analyse des nouveautés
-argument-hint: "[youtube|analyze|items|open|version]"
-allowed-tools: Bash, Read, Write, WebFetch
+description: Affiche les informations de veille Claude Code, versions actuelles et sources a consulter. Inclut la veille YouTube avec videos et transcripts. Utiliser quand on parle de nouveautes, mises a jour, changelog, ou veille YouTube.
+allowed-tools: Bash, Read
 context:
   - "~/cc-config/docs/veille.md"
 ---
 
-# Veille des nouveautés Claude Code
+# Veille des nouveautes Claude Code + YouTube
 
-Workflow complet de veille technologique : sources, vidéos YouTube et analyse.
+Affiche les informations de veille et les sources a consulter, incluant la veille YouTube.
 
-## Actions disponibles
+## Actions
 
-### 1. Résumé rapide (défaut)
+### Resume complet (defaut)
+
+1. Executer le script de veille Claude Code :
 ```bash
 ~/cc-config/scripts/veille.sh
 ```
-Affiche versions, sources et nouveautés en attente.
 
-### 2. Lancer YouTube Veille
+2. Recuperer les dernieres videos YouTube a transcrire :
 ```bash
-~/cc-config/scripts/veille.sh youtube
+curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=new" | python3 -c "
+import json, sys
+videos = json.load(sys.stdin)[:10]
+for v in videos:
+    mins = v['duration'] // 60
+    status = 'NEW' if v['status'] == 'new' else v['status'].upper()
+    print(f'  [{status}] {v[\"channelName\"]} - {v[\"title\"]} ({mins}min)')
+"
 ```
-- Démarre le serveur http://localhost:3000
-- Ouvre l'interface pour gérer chaînes et transcriptions
 
-### 3. Voir les items de veille
+3. Recuperer les videos recemment transcrites :
 ```bash
-~/cc-config/scripts/veille.sh items
+curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=transcribed" | python3 -c "
+import json, sys
+videos = json.load(sys.stdin)[:5]
+for v in videos:
+    mins = v['duration'] // 60
+    print(f'  [TRANSCRIT] {v[\"channelName\"]} - {v[\"title\"]} ({mins}min) - ID: {v[\"id\"]}')
+"
 ```
-Liste les features découvertes avec leur statut (🆕 discovered, 🧪 testing, ✅ applied, ❌ rejected)
 
-### 4. Analyser les transcriptions (Claude)
+4. Afficher un resume combine avec les deux sources.
 
-Quand l'utilisateur demande d'analyser les nouveautés :
-
-1. **Vérifier les items existants** dans la table `veille_items` :
-   ```bash
-   cd ~/projects/youtube-veille && node -e "
-   const Database = require('better-sqlite3');
-   const db = new Database('./data/youtube-veille.db');
-   const items = db.prepare('SELECT title, status FROM veille_items').all();
-   console.log(JSON.stringify(items));
-   "
-   ```
-
-2. **Lire les transcriptions récentes** :
-   ```bash
-   cd ~/projects/youtube-veille && node -e "
-   const Database = require('better-sqlite3');
-   const db = new Database('./data/youtube-veille.db');
-   const rows = db.prepare(\`
-     SELECT v.id, v.title, t.content
-     FROM transcripts t
-     JOIN videos v ON t.video_id = v.id
-     ORDER BY t.created_at DESC
-     LIMIT 5
-   \`).all();
-   console.log(JSON.stringify(rows));
-   "
-   ```
-
-3. **Extraire les points clés** (ignorer ceux déjà dans veille_items) :
-   - Nouvelles fonctionnalités Claude Code
-   - Bonnes pratiques mentionnées
-   - Tips et astuces
-
-4. **Ajouter les nouveaux items** à la DB :
-   ```bash
-   ~/cc-config/scripts/veille.sh add "Nom de la feature" "youtube"
-   ```
-
-5. **Mettre à jour veille.md** avec le rapport
-
-### 5. Marquer un item comme appliqué
-```bash
-~/cc-config/scripts/veille.sh mark <id> applied
-```
-Statuts possibles : `discovered`, `testing`, `applied`, `rejected`
-
-### 6. Ouvrir les sources web
+### Ouvrir les sources
 ```bash
 ~/cc-config/scripts/veille.sh open
 ```
 
-## Sources officielles
+### Ouvrir YouTube Veille dans le navigateur
+```bash
+xdg-open "https://$(cat ~/.claude/.veille-auth)@veille-eric.francecentral.cloudapp.azure.com" 2>/dev/null &
+```
+
+### Juste les versions
+```bash
+~/cc-config/scripts/veille.sh version
+```
+
+### Veille YouTube uniquement
+
+Lister les videos :
+```bash
+curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=new"
+```
+
+### Lire un transcript
+```bash
+curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/transcribe?videoId=VIDEO_ID"
+```
+
+### Lister les chaines suivies
+```bash
+curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/channels"
+```
+
+### Afficher les notes de veille
+Lire `~/cc-config/docs/veille.md` pour voir l'historique complet.
+
+## YouTube Veille - API
+
+Base URL : `https://veille-eric.francecentral.cloudapp.azure.com`
+Auth : Basic Auth (`$(cat ~/.claude/.veille-auth)`)
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/videos` | Liste toutes les videos |
+| `GET /api/videos?status=new` | Videos a transcrire |
+| `GET /api/videos?status=transcribed` | Videos transcrites |
+| `GET /api/videos?status=read` | Videos lues |
+| `GET /api/videos/{id}` | Details d'une video |
+| `GET /api/channels` | Chaines suivies |
+| `GET /api/transcribe?videoId={id}` | Recuperer le transcript |
+
+### Structure d'une video
+
+```json
+{
+  "id": "VIDEO_YT_ID",
+  "channelId": "CHANNEL_ID",
+  "title": "Titre de la video",
+  "channelName": "Nom de la chaine",
+  "publishedAt": "2026-02-06T17:00:38.000Z",
+  "duration": 1294,
+  "status": "new|transcribed|read",
+  "hasTranscript": true
+}
+```
+
+### Structure d'un transcript
+
+```json
+{
+  "videoId": "VIDEO_YT_ID",
+  "content": "Texte complet du transcript...",
+  "source": "youtube_captions",
+  "segmentsCount": 1,
+  "createdAt": "2026-02-07T05:34:35.000Z"
+}
+```
+
+## Sources officielles Claude Code
 
 | Source | URL |
 |--------|-----|
 | Changelog officiel | https://docs.anthropic.com/en/docs/claude-code/changelog |
 | GitHub Releases | https://github.com/anthropics/claude-code/releases |
 | Blog Anthropic | https://www.anthropic.com/news |
+| Discord Anthropic | https://discord.gg/anthropic |
 | npm | https://www.npmjs.com/package/@anthropic-ai/claude-code |
 
-## Chaînes YouTube (configurées dans youtube-veille)
+## Sources communautaires
 
-| Chaîne | Focus |
-|--------|-------|
-| Anthropic | Officiel |
-| AI Explained | News AI |
-| Matthew Berman | Reviews outils AI |
-| All About AI | Demos pratiques |
-| Melvyn X (FR) | Dev & IA |
-| Benjamin Code (FR) | Dev & IA |
+| Source | URL |
+|--------|-----|
+| Reddit r/ClaudeAI | https://reddit.com/r/ClaudeAI |
+| Twitter/X #ClaudeCode | https://x.com/search?q=claudecode |
+| GitHub Issues | https://github.com/anthropics/claude-code/issues |
 
-## Workflow type
+## Documentation complete
 
-```
-/veille youtube          # Ouvrir l'app, transcrire des vidéos
-/veille analyze          # Analyser et ajouter à la DB
-/veille items            # Voir les features découvertes
-/veille mark 3 applied   # Marquer comme appliqué
-```
-
-## Base de données
-
-La DB SQLite `~/projects/youtube-veille/data/youtube-veille.db` contient :
-- `channels` : Chaînes suivies
-- `videos` : Vidéos avec statut (new/transcribed/read)
-- `transcripts` : Contenu des transcriptions
-- `veille_items` : Features découvertes avec statut de suivi
+Le fichier `~/cc-config/docs/veille.md` (charge en contexte) contient :
+- Historique des nouveautes testees et adoptees
+- Notes de veille detaillees
+- Process de veille hebdomadaire
+- Documentation BMAD Method
