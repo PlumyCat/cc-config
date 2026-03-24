@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Script d'installation de la configuration Claude Code
-# Usage: ./install.sh [--dry-run] [--backup] [--mcp]
+# Usage: ./install.sh [--dry-run] [--backup] [--mcp] [--bashrc] [--bmad] [--full]
 #
 
 set -e
@@ -19,6 +19,8 @@ NC='\033[0m'
 DRY_RUN=false
 DO_BACKUP=false
 DO_MCP=false
+DO_BASHRC=false
+DO_BMAD=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -35,11 +37,28 @@ while [[ $# -gt 0 ]]; do
             DO_MCP=true
             shift
             ;;
+        --bashrc)
+            DO_BASHRC=true
+            shift
+            ;;
+        --bmad)
+            DO_BMAD=true
+            shift
+            ;;
+        --full)
+            DO_BACKUP=true
+            DO_BASHRC=true
+            DO_BMAD=true
+            shift
+            ;;
         -h|--help)
-            echo "Usage: $0 [--dry-run] [--backup] [--mcp]"
+            echo "Usage: $0 [--dry-run] [--backup] [--mcp] [--bashrc] [--bmad] [--full]"
             echo "  --dry-run  Affiche les actions sans les exécuter"
             echo "  --backup   Sauvegarde la config existante avant installation"
             echo "  --mcp      Installe aussi la config MCP (nécessite mcp-secrets.env)"
+            echo "  --bashrc   Ajoute les aliases Claude Code au ~/.bashrc"
+            echo "  --bmad     Installe BMAD Method v6 globalement"
+            echo "  --full     Équivalent à --backup --bashrc --bmad"
             exit 0
             ;;
         *)
@@ -180,6 +199,51 @@ if [ "$DO_MCP" = true ]; then
         run "$SCRIPT_DIR/scripts/mcp-install.sh --check"
     else
         run "$SCRIPT_DIR/scripts/mcp-install.sh"
+    fi
+fi
+
+# Installer bashrc si demandé
+BASHRC_SOURCE="$SCRIPT_DIR/dotfiles/bashrc-claude.sh"
+BASHRC_MARKER="# >>> cc-config bashrc >>>"
+BASHRC_MARKER_END="# <<< cc-config bashrc <<<"
+
+if [ "$DO_BASHRC" = true ]; then
+    if [ -f "$BASHRC_SOURCE" ]; then
+        log "Installation des aliases Claude Code dans ~/.bashrc..."
+        if grep -q "$BASHRC_MARKER" "$HOME/.bashrc" 2>/dev/null; then
+            # Remplacer le bloc existant
+            log "Bloc existant détecté, mise à jour..."
+            if [ "$DRY_RUN" = false ]; then
+                # Supprimer l'ancien bloc
+                sed -i "/$BASHRC_MARKER/,/$BASHRC_MARKER_END/d" "$HOME/.bashrc"
+            else
+                echo -e "${YELLOW}[DRY-RUN]${NC} Remplacement du bloc existant dans ~/.bashrc"
+            fi
+        fi
+        if [ "$DRY_RUN" = false ]; then
+            {
+                echo ""
+                echo "$BASHRC_MARKER"
+                cat "$BASHRC_SOURCE"
+                echo "$BASHRC_MARKER_END"
+            } >> "$HOME/.bashrc"
+        else
+            echo -e "${YELLOW}[DRY-RUN]${NC} Ajout du bloc Claude Code dans ~/.bashrc"
+        fi
+        log "Aliases ajoutés. Lancez 'source ~/.bashrc' pour activer."
+    else
+        warn "Fichier $BASHRC_SOURCE introuvable, bashrc non modifié."
+    fi
+fi
+
+# Installer BMAD si demandé
+if [ "$DO_BMAD" = true ]; then
+    log "Installation de BMAD Method v6..."
+    BMAD_CMD='npx bmad-method install --directory ~/.claude --tools claude-code --modules bmm --communication-language French --document-output-language French --user-name eric --yes'
+    if [ "$DRY_RUN" = true ]; then
+        echo -e "${YELLOW}[DRY-RUN]${NC} $BMAD_CMD"
+    else
+        eval "$BMAD_CMD"
     fi
 fi
 
