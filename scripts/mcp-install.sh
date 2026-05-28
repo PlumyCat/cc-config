@@ -81,6 +81,7 @@ substitute_vars() {
     # Utiliser jq pour substituer les variables de manière sécurisée
     # --arg échappe automatiquement les caractères spéciaux JSON
     jq --arg github_token "${GITHUB_TOKEN:-}" \
+       --arg obsidian_key "${OBSIDIAN_API_KEY:-}" \
        --arg home "$HOME" \
        '
        # Substituer GITHUB_TOKEN dans github.env
@@ -88,6 +89,9 @@ substitute_vars() {
 
        # Substituer GITHUB_TOKEN dans ms-learn.headers
        ."ms-learn".headers.Authorization = "Bearer \($github_token)" |
+
+       # Substituer OBSIDIAN_API_KEY dans obsidian.headers
+       (if .obsidian then .obsidian.headers.Authorization = "Bearer \($obsidian_key)" else . end) |
 
        # Substituer HOME dans memory.args
        .memory.args = ["-y", "@modelcontextprotocol/server-memory", "--env", "MEMORY_FILE_PATH=\($home)/.claude/memory.json"] |
