@@ -1,16 +1,26 @@
 ---
 name: cc-install
-description: Installation de la configuration Claude Code depuis cc-config vers ~/.claude
+description: Installation de la configuration Codex / Claude Code depuis cc-config vers ~/.codex ou ~/.claude
 disable-model-invocation: true
-argument-hint: "[--backup] [--dry-run] [--mcp]"
+argument-hint: "[--codex-only] [--backup] [--dry-run] [--mcp]"
 allowed-tools: Bash
 ---
 
-# Installation de la config Claude Code
+# Installation de la config Codex / Claude Code
 
-Installe la configuration depuis le dépôt cc-config vers ~/.claude.
+Installe la configuration depuis le dépôt cc-config vers `~/.codex` ou `~/.claude`.
 
 ## Commandes
+
+### Installation Codex uniquement
+```bash
+~/cc-config/install.sh --codex-only
+```
+
+### Simulation Codex
+```bash
+~/cc-config/install.sh --codex-only --dry-run
+```
 
 ### Installation standard
 ```bash
@@ -34,11 +44,20 @@ Installe la configuration depuis le dépôt cc-config vers ~/.claude.
 
 ### Toutes les options
 ```bash
-~/cc-config/install.sh --backup --mcp
+~/cc-config/install.sh --backup --mcp --codex
 ```
 
 ## Ce qui est installé
 
+### Codex
+- `AGENTS.md` → `~/.codex/AGENTS.md`
+- `skills/*/SKILL.md` → `~/.agents/skills/`
+- `commands/**/*.md` → skills Codex `command-*`
+- `agents/*.md` → `~/.codex/agents/*.toml`
+- `hooks/*` → `~/.codex/hooks/`
+- `settings/mcp-servers.json` → sections MCP gérées de `~/.codex/config.toml`
+
+### Claude Code
 - `settings.json` → `~/.claude/settings.json`
 - `skills/*/SKILL.md` → `~/.claude/skills/`
 - `agents/*.md` → `~/.claude/agents/`
@@ -46,4 +65,4 @@ Installe la configuration depuis le dépôt cc-config vers ~/.claude.
 
 ## Après installation
 
-Affiche le résumé et rappelle de redémarrer Claude Code si nécessaire pour appliquer les changements.
+Affiche le résumé et rappelle de redémarrer Codex ou Claude Code si nécessaire pour appliquer les changements.

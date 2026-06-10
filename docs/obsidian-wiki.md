@@ -2,6 +2,8 @@
 
 > Pattern LLM Wiki (Karpathy) + plugin claude-obsidian (AgriciDaniel) pour transformer Obsidian en mémoire persistante et cross-référencée par projet.
 
+Pour un parcours d'apprentissage progressif avec Codex et NotebookLM, voir `docs/apprentissage-obsidian-codex-notebooklm.md`.
+
 ## Pourquoi
 
 Claude Code n'a pas de mémoire entre sessions. Pour les projets riches en docs (specs, stories, décisions, comptes-rendus), recharger le contexte coûte des tokens et reste partiel. Le pattern wiki :

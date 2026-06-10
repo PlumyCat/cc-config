@@ -32,7 +32,8 @@
       "Eslint *",
       "Prettier *",
       "Docker *",
-      "Make *"
+      "Make *",
+      "Bash(dev-browser *)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"
@@ -45,6 +46,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/notifications.py"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/next_steps.py"
           }
         ]
       }

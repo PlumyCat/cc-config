@@ -1,0 +1,7 @@
+interface:
+  display_name: "Daily CRM Sync"
+  short_description: "Saisie CRM depuis commits GitHub"
+  default_prompt: "Use $daily-crm-sync to prepare and validate my CRM time entries from recent GitHub commits."
+
+policy:
+  allow_implicit_invocation: true

@@ -14,14 +14,19 @@ Affiche les informations de veille et les sources a consulter, incluant la veill
 
 ### Resume complet (defaut)
 
-1. Executer le script de veille Claude Code :
+1. Verifier que le serveur YouTube Veille tourne, sinon le demarrer :
+```bash
+curl -s -o /dev/null http://localhost:4891/ || (cd ~/projects/youtube-veille && npm run start &>/tmp/youtube-veille.log &)
+```
+
+2. Executer le script de veille Claude Code :
 ```bash
 ~/cc-config/scripts/veille.sh
 ```
 
-2. Recuperer les dernieres videos YouTube a transcrire :
+3. Recuperer les dernieres videos YouTube a transcrire :
 ```bash
-curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=new" | python3 -c "
+curl -s "http://localhost:4891/api/videos?status=new" | python3 -c "
 import json, sys
 videos = json.load(sys.stdin)[:10]
 for v in videos:
@@ -31,9 +36,9 @@ for v in videos:
 "
 ```
 
-3. Recuperer les videos recemment transcrites :
+4. Recuperer les videos recemment transcrites :
 ```bash
-curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=transcribed" | python3 -c "
+curl -s "http://localhost:4891/api/videos?status=transcribed" | python3 -c "
 import json, sys
 videos = json.load(sys.stdin)[:5]
 for v in videos:
@@ -42,7 +47,7 @@ for v in videos:
 "
 ```
 
-4. Afficher un resume combine avec les deux sources.
+5. Afficher un resume combine avec les deux sources.
 
 ### Ouvrir les sources
 ```bash
@@ -51,7 +56,7 @@ for v in videos:
 
 ### Ouvrir YouTube Veille dans le navigateur
 ```bash
-xdg-open "https://$(cat ~/.claude/.veille-auth)@veille-eric.francecentral.cloudapp.azure.com" 2>/dev/null &
+open "http://localhost:4891" 2>/dev/null &
 ```
 
 ### Juste les versions
@@ -63,17 +68,17 @@ xdg-open "https://$(cat ~/.claude/.veille-auth)@veille-eric.francecentral.clouda
 
 Lister les videos :
 ```bash
-curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/videos?status=new"
+curl -s "http://localhost:4891/api/videos?status=new"
 ```
 
 ### Lire un transcript
 ```bash
-curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/transcribe?videoId=VIDEO_ID"
+curl -s "http://localhost:4891/api/transcribe?videoId=VIDEO_ID"
 ```
 
 ### Lister les chaines suivies
 ```bash
-curl -s -u "$(cat ~/.claude/.veille-auth)" "https://veille-eric.francecentral.cloudapp.azure.com/api/channels"
+curl -s "http://localhost:4891/api/channels"
 ```
 
 ### Afficher les notes de veille
@@ -81,8 +86,8 @@ Lire `~/cc-config/docs/veille.md` pour voir l'historique complet.
 
 ## YouTube Veille - API
 
-Base URL : `https://veille-eric.francecentral.cloudapp.azure.com`
-Auth : Basic Auth (`$(cat ~/.claude/.veille-auth)`)
+Base URL : `http://localhost:4891`
+Auth : Session cookie (login via navigateur ou API)
 
 | Endpoint | Description |
 |----------|-------------|

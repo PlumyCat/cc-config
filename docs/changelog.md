@@ -12,6 +12,12 @@ Historique des modifications de ma configuration Claude Code.
 
 ---
 
+## [2026-06-04] - Codex agent team
+
+### Ajouté
+- Skill `codex-agent-team` pour guider l'utilisation de sous-agents Codex.
+- Exemples d'usage dans `docs/usage.md`.
+
 ## [2025-01-16] - BMAD Method & Sprint Validation
 
 ### Ajouté

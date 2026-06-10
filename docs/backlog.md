@@ -110,3 +110,15 @@ chmod +x install-v6.sh
 ```bash
 npx bmad-method@alpha install
 ```
+
+- [ ] Réunion 3 bot-front 23/04 — Luc: relancer pour le fichier Excel astreinte SharePoint (envoyé mais impossible à ouvrir depuis Teams, cause à investiguer) (2026-04-23)
+
+- [ ] Réunion 3 bot-front 23/04 — Sandrine: obtenir nom/structure du canal Teams pour proposition créneaux RDV (éviter doublons front/bot) (2026-04-23)
+
+- [ ] Réunion 3 bot-front 23/04 — Sandrine: obtenir noms exacts des files dédiées (relances clients absents, accès Mandarine/Portal/Cloud Cockpit) (2026-04-23)
+
+- [ ] Demande PIM Mail.Send pour l'app registration Dataverse (95484ded-517d-4580-83ff-82a5de9eca73) — nécessaire pour que callqueue-manager puisse envoyer l'email d'alerte quand le quota SendGrid 100/jour est atteint. Une fois la permission accordée + admin consent, l'auto-pause de la queue enverra un mail à efer@be-cloud.fr. Sans ça, l'auto-pause et la bannière dashboard fonctionnent mais l'email est skippé silencieusement. (2026-04-27)
+
+- [ ] Migrer tous les secrets du Container App ca-follow-up-calls vers Azure Key Vault kv-follow-up-calls. Plusieurs env vars sont en clair (DATAVERSE_CLIENT_SECRET, AZURE_OPENAI_API_KEY_REALTIME, ACS_CONNECTION_STRING, DATAVERSE_CLIENT_ID, DATAVERSE_TENANT_ID, ACS_PHONE_NUMBER). La MI System-Assigned a deja le role 'Key Vault Secrets User' sur kv-follow-up-calls (pose 2026-05-20). Pattern : creer secret KV puis poser env var avec secretRef. Pas urgent, mais a faire avant prod publique. (2026-05-20)
+
+- [ ] Demander à Benoit de créer une vue pour visualiser la file des tickets "Assistant IA de rendez-vous" (2026-05-22)

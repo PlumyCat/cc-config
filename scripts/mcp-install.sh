@@ -84,20 +84,25 @@ substitute_vars() {
        --arg obsidian_key "${OBSIDIAN_API_KEY:-}" \
        --arg home "$HOME" \
        '
-       # Substituer GITHUB_TOKEN dans github.env
-       .github.env.GITHUB_PERSONAL_ACCESS_TOKEN = $github_token |
+       if has("github") then
+         .github.env.GITHUB_PERSONAL_ACCESS_TOKEN = $github_token
+       else . end |
 
-       # Substituer GITHUB_TOKEN dans ms-learn.headers
-       ."ms-learn".headers.Authorization = "Bearer \($github_token)" |
+       if has("ms-learn") then
+         ."ms-learn".headers.Authorization = "Bearer \($github_token)"
+       else . end |
 
-       # Substituer OBSIDIAN_API_KEY dans obsidian.headers
-       (if .obsidian then .obsidian.headers.Authorization = "Bearer \($obsidian_key)" else . end) |
+       if has("obsidian") then
+         .obsidian.headers.Authorization = "Bearer \($obsidian_key)"
+       else . end |
 
-       # Substituer HOME dans memory.args
-       .memory.args = ["-y", "@modelcontextprotocol/server-memory", "--env", "MEMORY_FILE_PATH=\($home)/.claude/memory.json"] |
+       if has("memory") then
+         .memory.args = ["-y", "@modelcontextprotocol/server-memory", "--env", "MEMORY_FILE_PATH=\($home)/.claude/memory.json"]
+       else . end |
 
-       # Substituer HOME dans serena.args
-       .serena.args = ["--directory", "\($home)/serena", "run", "serena-mcp-server"]
+       if has("serena") then
+         .serena.args = ["--directory", "\($home)/serena", "run", "serena-mcp-server"]
+       else . end
        ' "$TEMPLATE_FILE"
 }
 

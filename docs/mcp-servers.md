@@ -207,8 +207,8 @@ GITHUB_TOKEN=ghp_xxxx
 
 ### Serveur ne répond pas
 ```bash
-# Utiliser la commande de debug
-/debug-mcp
+# Vérifier les serveurs MCP connectés
+claude mcp list
 ```
 
 ### Vérifier la configuration
