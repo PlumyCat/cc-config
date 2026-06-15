@@ -127,12 +127,8 @@ def main():
         hook_event = input_data.get('hook_event_name', '')
         
         if hook_event == "Stop":
-            # Tâche terminée
-            send_notification(
-                "Claude Code", 
-                "✅ Task completed successfully!"
-            )
-            play_sound("finish")
+            # Les fins de tour sont trop bruyantes: ne notifier que les vrais besoins d'action.
+            sys.exit(0)
             
         elif hook_event == "Notification":
             # Claude attend une interaction

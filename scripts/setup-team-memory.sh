@@ -41,6 +41,24 @@ cat > "$vault_path/.obsidian/community-plugins.json" <<'JSON'
 ]
 JSON
 
+# Pré-seed le plugin Local REST API avec le token commun (issu de $OBSIDIAN_API_KEY)
+# afin que chaque vault soit immédiatement joignable par le MCP `obsidian`
+# (même clé partout, serveur HTTP sur 27123). data.json est git-ignoré : le token
+# ne part jamais dans le repo. Obsidian régénère le bloc crypto (HTTPS) au 1er lancement.
+if [ -n "${OBSIDIAN_API_KEY:-}" ]; then
+  mkdir -p "$vault_path/.obsidian/plugins/obsidian-local-rest-api"
+  cat > "$vault_path/.obsidian/plugins/obsidian-local-rest-api/data.json" <<JSON
+{
+  "insecurePort": 27123,
+  "enableInsecureServer": true,
+  "apiKey": "$OBSIDIAN_API_KEY"
+}
+JSON
+else
+  echo "WARN: OBSIDIAN_API_KEY non défini — data.json du Local REST API non pré-seedé." >&2
+  echo "      Exporte OBSIDIAN_API_KEY (cf. ~/.zshrc) puis relance, ou aligne la clé à la main." >&2
+fi
+
 cat > "$vault_path/.obsidian/core-plugins.json" <<'JSON'
 [
   "file-explorer",
